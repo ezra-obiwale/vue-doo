@@ -1,0 +1,20 @@
+{
+  "name": "vue-utils",
+  "author": {
+    "name": "Ezra Obiwale",
+    "email": "contact@ezraobiwale.com"
+  },
+  "bundleDependencies": [],
+  "description": "Utility library for VueJS",
+  "homepage": "https://github.com/ezra-obiwale/vue-utils#readme",
+  "license": "MIT",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezra-obiwale/vue-utils.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0"
+}
