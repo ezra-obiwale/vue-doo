@@ -2,23 +2,45 @@ import Http from './http';
 import Store from './store';
 import EventBus from './event-bus';
 
+let getTargets = (obj, key, asIs = false) => {
+  if (!asIs && typeof key === 'string' && key.indexOf('.') !== -1) {
+    let parts = key.split('.');
+    key = parts.pop();
+    parts.forEach(part => {
+      if (Array.isArray(obj)) {
+        while (obj[part] === undefined) {
+          obj.push({});
+        }
+      }
+      else if (!obj[part]) {
+        obj[part] = {};
+      }
+      obj = obj[part];
+    });
+  }
+  return {
+    key: key,
+    obj: obj
+  };
+};
 export default class {
   /**
    * Class constructor
    * @param {object} options Keyss include sotre (object), http (object)
    */
-  constructor(options = {}) {
+  constructor(Vue, options = {}) {
     this.options = options;
+    this.store = new Store(options.store, Vue);
   }
 
   all() {
-    let AppStore = new Store(this.options.store).vuex();
+    let options = this.options;
+    let AppStore = this.store;
+
     return {
-      data() {
-        return {
-          $http: new Http(this.options.http),
-          $eventBus: EventBus
-        }
+      beforeCreate() {
+          this.$http = new Http(options.http);
+          this.$event = EventBus;
       },
       methods: {
         deepDelete(target, baseObject) {
@@ -65,6 +87,21 @@ export default class {
           return value !== undefined && value !== null
             ? value : def;
         },
+        env(key, def, noeval) {
+          let env = process.env[key.toUpperCase()];
+
+          if (env !== undefined) {
+            if (noeval) return env;
+
+            try {
+              return eval(env);
+            }
+            catch (e) {
+              return env;
+            }
+          }
+          return def;
+        },
         findBy(key, value, data) {
           let result = null;
           if (Array.isArray(data)) {
@@ -82,35 +119,8 @@ export default class {
           }
           return result || {};
         },
-        fromStore(key, remove = false) {
-          let value = AppStore.state[key];
-          if (remove)
-            AppStore.dispatch('remove', key);
-          return value;
-        },
-        getTargets(obj, key, asIs = false) {
-          if (!asIs && typeof key === 'string' && key.indexOf('.') !== -1) {
-            let parts = key.split('.');
-            key = parts.pop();
-            parts.forEach(part => {
-              if (Array.isArray(obj)) {
-                while (obj[part] === undefined) {
-                  obj.push({});
-                }
-              }
-              else if (!obj[part]) {
-                obj[part] = {};
-              }
-              obj = obj[part];
-            });
-          }
-          return {
-            key: key,
-            obj: obj
-          };
-        },
         pull(obj, key) {
-          let targets = this.getTargets(obj, key);
+          let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
             return targets.obj.splice(targets.key, 1)[0];
           }
@@ -120,7 +130,7 @@ export default class {
         },
         pullValue(obj, value) {
           let pos,
-            targets = this.getTargets(obj, key);
+            targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
             pos = targets.obj.indexOf(value);
             if (pos === -1) return;
@@ -143,7 +153,7 @@ export default class {
           if (targets.obj) this.pull(targets.obj, pos);
         },
         push(obj, value, key, asIs = false) {
-          let targets = this.getTargets(obj, key, asIs);
+          let targets = getTargets(obj, key, asIs);
           if (Array.isArray(targets.obj)) {
             if (targets.key === undefined) obj.push(value);
             else obj.splice(targets.key, 0, value);
@@ -172,7 +182,7 @@ export default class {
         },
         set(obj, key, value) {
           if (!key) return;
-          let targets = this.getTargets(obj, key);
+          let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
             targets.obj.splice(targets.key, 1, value);
           }
@@ -180,8 +190,19 @@ export default class {
             this.push(targets.obj, value, targets.key);
           }
         },
-        toStore(key, value) {
-          return AppStore.dispatch('set', { key: key, value: value });
+        store(key, value) {
+          // get key
+          if (key && value === undefined) {
+            return AppStore.get(key);
+          }
+          // set key to value
+          else if (value !== undefined) {
+            return AppStore.set(key, value);
+          }
+          // get store object
+          else {
+            return AppStore;
+          }
         }
       }
     };

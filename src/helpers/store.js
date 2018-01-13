@@ -2,21 +2,23 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createdPersistedState from 'vuex-persistedstate';
 
-Vue.use(Vuex);
 
 export default class {
   /**
    * Class constructor
    * @param {object} options Keys include name (string)
    */
-  constructor(options = {}) {
-    this.options = options;
-  }
+  constructor(options = {}, _Vue) {
+    if (!_Vue) {
+      _Vue = Vue;
+    }
 
-  vuex() {
-    return new Vuex.Store({
+    _Vue.use(Vuex);
+
+    this.options = options;
+    this.vuex = new Vuex.Store({
       plugins: [createdPersistedState({
-        key: this.options.name || 'vuex'
+        key: options.name || 'vuex'
       })],
       state: {},
       mutations: {
@@ -35,6 +37,21 @@ export default class {
           return commit('REMOVE', key)
         }
       }
-    });
+    })
+  }
+
+  get(key) {
+    let value = this.vuex.state[key];
+    return value;
+  }
+
+  remove(key) {
+    this.vuex.dispatch('remove', key);
+    return this;
+  }
+
+  set(key, value) {
+    this.vuex.dispatch('set', { key: key, value: value });
+    return this;
   }
 }

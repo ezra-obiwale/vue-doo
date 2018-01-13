@@ -49,23 +49,33 @@ export default class Http {
       EventBus.$emit('ajax.started');
     }
     this.working++;
-    const responseParams = (resp) {
-      return {resp.data, resp.status, resp.headers, resp};
-    },
-      respond = (func, resp = {}) => {
-        this.working--;
-        if (!this.working && this.emitAjaxEvents) {
-          EventBus.$emit('ajax.ended');
-        }
-        func(...responseParams(resp));
-      };
+    const self = this;
+    const responseParams = resp => {
+      return [
+        resp.data,
+        resp.status,
+        resp.headers,
+        resp
+      ];
+    };
+    const respond = (func, resp = {}) => {
+      self.working--;
+      if (!self.working && self.emitAjaxEvents) {
+        EventBus.$emit('ajax.ended');
+      }
+      func(...responseParams(resp));
+    };
     return new Promise(function (resolve, reject) {
-      this[type]
-        .apply(this, args)
+      this[type](...args)
         .then(resp => {
-          respond(resolve, resp);
+          try {
+            respond(resolve, resp);
+          }
+          catch (e) {
+            console.debug(e);
+          }
         })
-        .catch((error) => {
+        .catch(error => {
           let resp = error.response;
           if (typeof this.options.catchAll == 'function') {
             this.options.catchAll(...responseParams(resp));
