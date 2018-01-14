@@ -6,7 +6,8 @@ import createdPersistedState from 'vuex-persistedstate';
 export default class {
   /**
    * Class constructor
-   * @param {object} options Keys include name (string)
+   * @param {object} options
+   * @param {Vue} Vue
    */
   constructor(options = {}, _Vue) {
     if (!_Vue) {
@@ -15,11 +16,8 @@ export default class {
 
     _Vue.use(Vuex);
 
-    this.options = options;
     this.vuex = new Vuex.Store({
-      plugins: [createdPersistedState({
-        key: options.name || 'vuex'
-      })],
+      plugins: [createdPersistedState(options)],
       state: {},
       mutations: {
         SET(state, payload) {
@@ -46,8 +44,9 @@ export default class {
   }
 
   remove(key) {
+    let val = this.get(key);
     this.vuex.dispatch('remove', key);
-    return this;
+    return val;
   }
 
   set(key, value) {

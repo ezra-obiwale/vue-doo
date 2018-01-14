@@ -10,7 +10,7 @@ function copySync(src, dest, overwrite = false) {
     fs.writeFileSync(dest, data);
 }
 
-const base_dir = path.dirname(path.dirname(__dirname));
+const base_dir = path.dirname(path.dirname(path.dirname(__dirname)));
 
 copySync('env.example.js', path.join(base_dir, 'env.js'));
 copySync('config.prod.env.js', path.join(base_dir, 'config', 'prod.env.js'), true);

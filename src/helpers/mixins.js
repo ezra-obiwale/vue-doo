@@ -2,8 +2,8 @@ import Http from './http';
 import Store from './store';
 import EventBus from './event-bus';
 
-let getTargets = (obj, key, asIs = false) => {
-  if (!asIs && typeof key === 'string' && key.indexOf('.') !== -1) {
+let getTargets = (obj, key, ignoreDots = false) => {
+  if (!ignoreDots && typeof key === 'string' && key.indexOf('.') !== -1) {
     let parts = key.split('.');
     key = parts.pop();
     parts.forEach(part => {
@@ -26,7 +26,7 @@ let getTargets = (obj, key, asIs = false) => {
 export default class {
   /**
    * Class constructor
-   * @param {object} options Keyss include sotre (object), http (object)
+   * @param {object} options Keyss include store (object), http (object)
    */
   constructor(Vue, options = {}) {
     this.options = options;
@@ -39,8 +39,8 @@ export default class {
 
     return {
       beforeCreate() {
-          this.$http = new Http(options.http);
-          this.$event = EventBus;
+        this.$http = new Http(options.http);
+        this.$event = EventBus;
       },
       methods: {
         deepDelete(target, baseObject) {
@@ -87,12 +87,10 @@ export default class {
           return value !== undefined && value !== null
             ? value : def;
         },
-        env(key, def, noeval) {
+        env(key, def) {
           let env = process.env[key.toUpperCase()];
 
           if (env !== undefined) {
-            if (noeval) return env;
-
             try {
               return eval(env);
             }
@@ -102,24 +100,24 @@ export default class {
           }
           return def;
         },
-        findBy(key, value, data) {
-          let result = null;
-          if (Array.isArray(data)) {
-            result = data.find(function (item) {
-              return item[key] == value;
-            });
-          }
-          else {
-            for (let a in data) {
-              if (data[a][key] == value) {
-                result = data[a];
-                break;
+        findIn(data, func, def) {
+          let result = undefined;
+          if (typeof func === 'function') {
+            if (Array.isArray(data)) {
+              result = data.find(func);
+            }
+            else {
+              for (let a in data) {
+                if (func(data[a], a)) {
+                  result = data[a];
+                  break;
+                }
               }
             }
           }
-          return result || {};
+          return result === undefined ? def : result;
         },
-        pull(obj, key) {
+        pull(key, obj) {
           let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
             return targets.obj.splice(targets.key, 1)[0];
@@ -128,7 +126,7 @@ export default class {
             return this.$delete(targets.obj, targets.key);
           }
         },
-        pullValue(obj, value) {
+        pullValue(value, obj) {
           let pos,
             targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
@@ -152,8 +150,8 @@ export default class {
           }
           if (targets.obj) this.pull(targets.obj, pos);
         },
-        push(obj, value, key, asIs = false) {
-          let targets = getTargets(obj, key, asIs);
+        push(value, obj, key, ignoreDots = false) {
+          let targets = getTargets(obj, key, ignoreDots);
           if (Array.isArray(targets.obj)) {
             if (targets.key === undefined) obj.push(value);
             else obj.splice(targets.key, 0, value);
@@ -163,10 +161,15 @@ export default class {
           }
         },
         range(start, end, step) {
+          // only one parameter: end
+          if (end === undefined) {
+            end = start;
+            start = 0;
+          }
           let range = [],
             increment = start < end,
             current = start;
-          step = step || 1;
+          step = Math.abs(step || 1);
           if (increment) {
             end++;
           }
@@ -180,7 +183,7 @@ export default class {
           }
           return range;
         },
-        set(obj, key, value) {
+        set(key, value, obj) {
           if (!key) return;
           let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
