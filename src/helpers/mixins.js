@@ -148,7 +148,7 @@ export default class {
               }
             }
           }
-          if (targets.obj) this.pull(targets.obj, pos);
+          if (targets.obj) this.pull(pos, targets.obj);
         },
         push(value, obj, key, ignoreDots = false) {
           let targets = getTargets(obj, key, ignoreDots);
@@ -190,7 +190,7 @@ export default class {
             targets.obj.splice(targets.key, 1, value);
           }
           else if (targets.obj) {
-            this.push(targets.obj, value, targets.key);
+            this.push(value, targets.obj, targets.key);
           }
         },
         store(key, value) {
