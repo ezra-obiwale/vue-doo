@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-function copySync(src, dest, overwrite = false) {
+function copySync(src, dest, overwrite) {
     if (fs.existsSync(src) && !overwrite) {
         return false;
     }
