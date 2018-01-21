@@ -1,6 +1,7 @@
 import Http from './http';
 import Store from './store';
 import EventBus from './event-bus';
+import Hello from 'hellojs';
 
 let getTargets = (obj, key, ignoreDots = false) => {
   if (!ignoreDots && typeof key === 'string' && key.indexOf('.') !== -1) {
@@ -117,6 +118,7 @@ export default class {
           }
           return result === undefined ? def : result;
         },
+        hello: Hello.init(options.hello || {}),
         pull(key, obj) {
           let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {

@@ -58,29 +58,32 @@ export default class Http {
         resp
       ];
     };
-    const respond = (func, resp = {}) => {
+    const beforeResponse = () => {
       self.working--;
       if (!self.working && self.emitAjaxEvents) {
         EventBus.$emit('ajax.ended');
       }
-      func(...responseParams(resp));
     };
     return new Promise(function (resolve, reject) {
       this[type](...args)
         .then(resp => {
           try {
-            respond(resolve, resp);
+            beforeResponse();
+            resolve(...responseParams(resp));
           }
           catch (e) {
-            console.debug(e);
+            console.error(e);
           }
         })
         .catch(error => {
           let resp = error.response;
+          beforeResponse();
           if (typeof this.options.catchAll == 'function') {
-            this.options.catchAll(...responseParams(resp));
+            this.options.catchAll(...responseParams(resp), reject);
           }
-          respond(reject, resp);
+          else {
+            reject(...responseParams(resp));
+          }
         });
     }.bind(this.axios));
   }

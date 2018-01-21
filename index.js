@@ -2,6 +2,13 @@ import Mixins from './src/helpers/mixins';
 import Store from './src/helpers/store';
 
 const VueUI = {
+  /**
+   * Installs the Vue plugin
+   * 
+   * @param {object} Vue Instance of vue to work with
+   * @param {object} options Options for this plugin. Keys include http (object) and store (object)
+   * @return {nothing}
+   */
   install: function (Vue, options = {}) {
     if (Vue._vutilv_) {
       return;
