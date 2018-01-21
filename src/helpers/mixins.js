@@ -42,6 +42,7 @@ export default class {
       beforeCreate() {
         this.$http = new Http(options.http);
         this.$event = EventBus;
+        this.$hello = Hello;
       },
       methods: {
         deepDelete(target, baseObject) {
@@ -119,6 +120,13 @@ export default class {
           return result === undefined ? def : result;
         },
         hello: Hello.init(options.hello || {}),
+        onHello(callback) {
+          Hello.on("auth.login", auth => {
+            if (typeof callback === 'function') {
+              callback(auth);
+            }
+          });
+        },
         pull(key, obj) {
           let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
@@ -213,3 +221,4 @@ export default class {
     };
   }
 }
+s
