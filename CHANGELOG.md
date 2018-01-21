@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 1.1.2
+
+Allowed passing of options object for [hellojs](https://adodson.com/hello.js)
+
 ## 1.1.1
 
 Added property `$hello` to hold the [hellojs](https://adodson.com/hello.js) object.

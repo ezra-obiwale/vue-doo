@@ -37,6 +37,18 @@ export default class {
   all() {
     let options = this.options;
     let AppStore = this.store;
+    let deepValue = (target, baseObject, def) => {
+      if (!target) return def;
+      let value = baseObject || {},
+        parts = target.split('.');
+      for (let i = 0; i < parts.length; i++) {
+        if (!value) break;
+        let cur = value[parts[i]];
+        value = cur;
+      }
+      return value !== undefined && value !== null
+        ? value : def;
+    };
 
     return {
       beforeCreate() {
@@ -77,18 +89,7 @@ export default class {
           }
           return baseObject;
         },
-        deepValue(target, baseObject, def) {
-          if (!target) return def;
-          let value = baseObject || {},
-            parts = target.split('.');
-          for (let i = 0; i < parts.length; i++) {
-            if (!value) break;
-            let cur = value[parts[i]];
-            value = cur;
-          }
-          return value !== undefined && value !== null
-            ? value : def;
-        },
+        deepValue: deepValue,
         env(key, def) {
           let env = process.env[key.toUpperCase()];
 
@@ -119,7 +120,7 @@ export default class {
           }
           return result === undefined ? def : result;
         },
-        hello: Hello.init(options.hello || {}),
+        hello: Hello.init(deepValue('hello.credentials', options, {}), deepValue('hello.options', options, {})),
         onHello(callback) {
           Hello.on("auth.login", auth => {
             if (typeof callback === 'function') {
@@ -221,4 +222,3 @@ export default class {
     };
   }
 }
-s
