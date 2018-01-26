@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 1.1.3
+
+Copy existing `env.example.js` file instead of default.
+
 ## 1.1.2
 
 Allowed passing of options object for [hellojs](https://adodson.com/hello.js)
