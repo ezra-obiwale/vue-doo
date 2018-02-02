@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## 1.1.4
+
+Allowed values in the `env.js` file to be overwritten by those set in the command
+line.
+
 ## 1.1.3
 
 Copy existing `env.example.js` file instead of default.

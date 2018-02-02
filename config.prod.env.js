@@ -8,7 +8,7 @@ try {
   if (custom) {
     // add them to the real environment variables
     for (let key in custom) {
-      env[key] = '"' + custom[key] + '"';
+      env[key] = '"' + (process.env[key] || custom[key]) + '"';
     }
   }
 }
