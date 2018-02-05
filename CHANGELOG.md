@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 1.1.5
+
+Ensure mixin method `pullValue()` returns the pulled value.
+
 ## 1.1.4
 
 Allowed values in the `env.js` file to be overwritten by those set in the command

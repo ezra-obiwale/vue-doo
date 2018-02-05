@@ -159,7 +159,7 @@ export default class {
               }
             }
           }
-          if (targets.obj) this.pull(pos, targets.obj);
+          if (targets.obj) return this.pull(pos, targets.obj);
         },
         push(value, obj, key, ignoreDots = false) {
           let targets = getTargets(obj, key, ignoreDots);
