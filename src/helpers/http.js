@@ -7,8 +7,7 @@ export default class Http {
    * @param {object} options Keys include ajaxEvents (bool), axios (object) and catchAll (function)
    */
   constructor(options = {}) {
-    this.axios = axios.create(options.axios);
-    this.emitAjaxEvents = options.ajaxEvents !== false;
+    this.reset(options);
     this.working = 0;
   }
 
@@ -42,6 +41,11 @@ export default class Http {
 
   request() {
     return this._send('request', arguments);
+  }
+
+  reset(options = {}) {
+    this.axios = axios.create(options.axios);
+    this.emitAjaxEvents = options.ajaxEvents !== false;
   }
 
   _send(type, args) {

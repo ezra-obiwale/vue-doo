@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## 1.2.0
+
+- Added a third parameter to mixin method `pullValue`, a function to call on each item in the object/array.
+- Added method `reset` to `$http`
+
 ## 1.1.5
 
 Ensure mixin method `pullValue()` returns the pulled value.
@@ -19,8 +24,8 @@ Allowed passing of options object for [hellojs](https://adodson.com/hello.js)
 
 ## 1.1.1
 
-Added property `$hello` to hold the [hellojs](https://adodson.com/hello.js) object.
-Added method `onHello`, a shortcut to `this.$hello.on('auth.login')`.
+- Added property `$hello` to hold the [hellojs](https://adodson.com/hello.js) object.
+- Added method `onHello`, a shortcut to `this.$hello.on('auth.login')`.
 
 ## 1.1.0
 

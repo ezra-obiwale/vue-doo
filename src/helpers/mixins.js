@@ -137,29 +137,40 @@ export default class {
             return this.$delete(targets.obj, targets.key);
           }
         },
-        pullValue(value, obj) {
-          let pos,
-            targets = getTargets(obj, key);
-          if (Array.isArray(targets.obj)) {
-            pos = targets.obj.indexOf(value);
+        pullValue(value, obj, func) {
+          let pos;
+          if (value === undefined || !obj) return;
+
+          if (Array.isArray(obj)) {
+            pos = func ? obj.findIndex(func) : obj.indexOf(value);
             if (pos === -1) return;
           }
-          else if (targets.obj) {
-            let _value = typeof value === 'object'
-              ? JSON.stringify(value)
-              : value;
-            for (let a in targets.obj) {
-              let _value2 = typeof targets.obj[a] === 'object'
-                ? JSON.stringify(targets.obj[a])
-                : targets.obj[a];
+          else if (obj) {
+            for (let a in obj) {
+              if (func) {
+                let ps = func(obj[a], a);
+                if (ps) {
+                  pos = a;
+                  break;
+                }
+              }
+              else {
+                let _value = typeof value === 'object'
+                  ? JSON.stringify(value)
+                  : value;
+                let _value2 = typeof obj[a] === 'object'
+                  ? JSON.stringify(obj[a])
+                  : obj[a];
 
-              if (_value == _value2) {
-                pos = a;
-                break;
+                if (_value == _value2) {
+                  pos = a;
+                  break;
+                }
               }
             }
           }
-          if (targets.obj) return this.pull(pos, targets.obj);
+
+          if (obj) return this.pull(pos, obj);
         },
         push(value, obj, key, ignoreDots = false) {
           let targets = getTargets(obj, key, ignoreDots);
