@@ -1,4 +1,10 @@
-# CHANGE LOG
+## 1.3.0
+
+- Added hellojs
+- Added sweetalert
+- Added vue-social-sharing
+- Added vue-toasted
+- Added components
 
 ## 1.2.0
 

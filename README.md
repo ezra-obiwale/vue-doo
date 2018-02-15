@@ -75,8 +75,8 @@ app. These packages include:
 - axios
 - hello.js
 - sweetalert
-- vue-toasted
 - vue-social-sharing
+- vue-toasted
 - vuex
 - vuex-persistedstate
 
