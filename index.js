@@ -1,5 +1,6 @@
 import Mixins from './src/helpers/mixins';
 import Store from './src/helpers/store';
+import components from './src/components';
 
 const VueUI = {
   /**
@@ -21,16 +22,18 @@ const VueUI = {
     // Add mixins
     Vue.mixin(mixins.all());
 
-    let registerComponent = group => {
+    let camelToHyphen = str => {
+      return str.split(/(?=[A-Z])/).join('-').toLowerCase();
+    };
+    let registerComponents = group => {
       for (let component in group.default) {
         let comp = group.default[component];
-        Vue.component(this.camelToHyphen(comp.name), comp);
+        Vue.component(this.camelToHyphen(component), comp);
       }
 
     };
-    let camelToHyphen = (str) => {
-      return str.split(/(?=[A-Z])/).join('-').toLowerCase();
-    };
+
+    registerComponents(components);
   },
   store(options, Vue) {
     return new Store(options, Vue);

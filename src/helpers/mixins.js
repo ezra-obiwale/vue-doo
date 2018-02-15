@@ -2,6 +2,9 @@ import Http from './http';
 import Store from './store';
 import EventBus from './event-bus';
 import Hello from 'hellojs';
+import Swal from 'sweetalert';
+import Toasted from 'vue-toasted';
+let VueSocialSharing = require('vue-social-sharing');
 
 let getTargets = (obj, key, ignoreDots = false) => {
   if (!ignoreDots && typeof key === 'string' && key.indexOf('.') !== -1) {
@@ -32,6 +35,8 @@ export default class {
   constructor(Vue, options = {}) {
     this.options = options;
     this.store = new Store(options.store, Vue);
+    Vue.use(Toasted, options.toasts);
+    Vue.use(VueSocialSharing)
   }
 
   all() {
@@ -52,8 +57,8 @@ export default class {
 
     return {
       beforeCreate() {
-        this.$http = new Http(options.http);
         this.$event = EventBus;
+        this.$http = new Http(options.http);
         this.$hello = Hello;
       },
       methods: {
@@ -121,6 +126,21 @@ export default class {
           return result === undefined ? def : result;
         },
         hello: Hello.init(deepValue('hello.credentials', options, {}), deepValue('hello.options', options, {})),
+        imagePreview(input, callback) {
+          input.onchange = function() {
+            let reader = new FileReader();
+
+            reader.onload = function (e) {
+              // get loaded data and render thumbnail.
+              if (typeof callback == 'function') {
+                callback(e.target.result);
+              }
+            };
+
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+          };
+        },
         onHello(callback) {
           Hello.on("auth.login", auth => {
             if (typeof callback === 'function') {
@@ -228,6 +248,10 @@ export default class {
           else {
             return AppStore;
           }
+        },
+        swal: Swal,
+        toast(message, options) {
+          return this.$toasted.show(message, options);
         }
       }
     };

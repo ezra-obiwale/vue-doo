@@ -13,30 +13,50 @@ import Vue from 'vue';
 import VueDoo from '@ezraobiwale/voo-doo';
 
 Vue.use(VueDoo, {
-    // trigger ajax.started and ajax.ended events
-    http: {
-        // trigger ajax.started and ajax.ended events
-        ajaxEvents: true,
-        // axios configuration object
-        // @see https://github.com/axios/axios#axioscreateconfig
-        axios: {
-            baseUrl: 'https://api.example.com',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer some-authentication-token'
-            }
-        },
-        // function to call for all request errors
-        catchAll(error_response) {
-            // do something with error_response object
-            console.error('Request error:', error_response);
-        }
+  // hellojs (social login) config object
+  // @see https://adodson.com/hello.js/#helloinit
+  hello: {
+    // credentials object
+    credentials: {
+      facebook: id,
+      windows: id,
+      google: id,
+      // ...
     },
-    // vuex-persistedstate configuration object
-    // @see https://github.com/robinvdvleuten/vuex-persistedstate#createpersistedstateoptions
-    store: {
-        name: 'some-store-name'
+    // options object
+    options: {
+
     }
+  },
+  // trigger ajax.started and ajax.ended events
+  http: {
+      // trigger ajax.started and ajax.ended events
+      ajaxEvents: true,
+      // axios configuration object
+      // @see https://github.com/axios/axios#axioscreateconfig
+      axios: {
+          baseUrl: 'https://api.example.com',
+          headers: {
+              Accept: 'application/json',
+              Authorization: 'Bearer some-authentication-token'
+          }
+      },
+      // function to call for all request errors
+      catchAll(error_response) {
+          // do something with error_response object
+          console.error('Request error:', error_response);
+      }
+  },
+  // vuex-persistedstate configuration object
+  // @see https://github.com/robinvdvleuten/vuex-persistedstate#createpersistedstateoptions
+  store: {
+      name: 'some-store-name'
+  },
+  // vue-toasted configuration object
+  // @see https://github.com/shakee93/vue-toasted#api
+  toasts: {
+    iconPack: 'fontawesome'
+  }
 });
 ```
 
@@ -44,13 +64,34 @@ Vue.use(VueDoo, {
 
 Using environment variables may be sometimes necessary even for frontend.
 
-On install, an `env.js` file is created in the root directory and the 
+On install, an `env.js` file is created in the root directory and the
 `config/prod.env.js` file is changed to ensure the variables are processed.
+
+### Packages
+
+`VueDoo` is a combination of super-powerful packages needed for every Vue frontend
+app. These packages include:
+
+- axios
+- hello.js
+- sweetalert
+- vue-toasted
+- vue-social-sharing
+- vuex
+- vuex-persistedstate
 
 ### Global Properties
 
 Two properties are added to all `Vue` instances, thereby making them available
 in all components on the context `this`.
+
+#### this.$event
+
+A global event bus.
+
+#### this.$hello
+
+The [hellojs](https://adodson.com/hello.js) object.
 
 #### this.$http
 
@@ -70,9 +111,9 @@ this.$http.get('/path/to/resource')
 
 **Note**: `data` is the actual response received from the server.
 
-#### this.$event
+#### this.$toasted
 
-A global event bus.
+The [vue-toasted](https://github.com/shakee93/vue-toasted) object.
 
 ### Methods
 
@@ -228,3 +269,11 @@ store.get('env'); // undefined
 this.store('env', 'testing'); // Store object
 this.store('env'); // testing
 ```
+
+#### this.swal( ... )
+
+The [sweetalert function](https://sweetalert.js.org/guides/#getting-started)
+
+#### this.toast(messae, options)
+
+A shortcut to `this.$toasted.show(message, options)`.
