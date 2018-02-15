@@ -1,3 +1,6 @@
+## 1.3.1
+
+Fixed components registration issue
 ## 1.3.0
 
 - Added sweetalert
