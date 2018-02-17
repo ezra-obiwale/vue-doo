@@ -1,3 +1,7 @@
+## 1.3.2
+
+Added properties `svg-width` and `svg-height` to the loading component
+
 ## 1.3.1
 
 Fixed components registration issue

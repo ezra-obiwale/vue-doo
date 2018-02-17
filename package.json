@@ -8,11 +8,11 @@
     "axios": "^0.17.1",
     "hellojs": "^2.0.0-4",
     "sweetalert": "^2.1.0",
-    "vue": "^2.5.2",
-    "vuex": "^3.0.1",
-    "vuex-persistedstate": "^2.4.2",
+    "vue": "^2.5.13",
     "vue-social-sharing": "^2.3.3",
-    "vue-toasted": "^1.1.24"
+    "vue-toasted": "^1.1.24",
+    "vuex": "^3.0.1",
+    "vuex-persistedstate": "^2.4.2"
   },
   "bundleDependencies": [],
   "description": "Utility library for VueJS",
