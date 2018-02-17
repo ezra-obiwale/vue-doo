@@ -54,12 +54,29 @@ export default class {
       return value !== undefined && value !== null
         ? value : def;
     };
+    let path = path => {
+      return options.navPath ? options.navPath(path) : path;
+    };
 
     return {
       beforeCreate() {
         this.$event = EventBus;
         this.$http = new Http(options.http);
         this.$hello = Hello;
+        let $vm = this;
+        this.$nav = {
+          path: path,
+          push() {
+            let args = Array.from(arguments);
+            args[0] = path(args[0]);
+            return $vm.$router.push(...args);
+          },
+          replace() {
+            let args = Array.from(arguments);
+            args[0] = path(args[0]);
+            return $vm.$router.replace(...args);
+          }
+        };
       },
       methods: {
         deepDelete(target, baseObject) {
@@ -127,7 +144,7 @@ export default class {
         },
         hello: Hello.init(deepValue('hello.credentials', options, {}), deepValue('hello.options', options, {})),
         imagePreview(input, callback) {
-          input.onchange = function() {
+          input.onchange = function () {
             let reader = new FileReader();
 
             reader.onload = function (e) {

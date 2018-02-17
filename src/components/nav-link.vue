@@ -14,7 +14,7 @@ export default {
   },
   computed: {
     url() {
-      return this._processUrls(this.to);
+      return this.$nav.path(this.to);
     }
   }
 }

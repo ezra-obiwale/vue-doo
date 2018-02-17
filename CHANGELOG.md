@@ -1,3 +1,8 @@
+## 2.0.0
+
+- Replaced component `a-link` with `nav-link`
+- Options object now take key `navPath` which is a function
+
 ## 1.3.3
 
 Changed properties `svg-width` and `svg-height` to `width` and `height` respectively on the loading component

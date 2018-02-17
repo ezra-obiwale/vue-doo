@@ -1,9 +1,9 @@
-import ALink from './a-link';
 import Loading from './loading';
 import PageData from './page-data';
+import NavLink from './nav-link';
 
 export default {
-    ALink,
     Loading,
-    PageData
+    PageData,
+    NavLink
 }
