@@ -1,14 +1,13 @@
 <template>
     <!-- Credit: https://codepen.io/aurer/pen/jEGbA -->
     <!-- 1 -->
-    <span v-if="show(1)" class="loader loader--style1">
-      <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-      :width="width" :height="height" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+    <svg v-if="show(1)" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+    :width="svgWidth" :height="svgHeight" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
       <path opacity="0.2" :fill="color" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
         s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
         c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
       <path :fill="color" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
-        C22.32,8.481,24.301,9.057,26.013,10.047z">
+      C22.32,8.481,24.301,9.057,26.013,10.047z">
         <animateTransform attributeType="xml"
           attributeName="transform"
           type="rotate"
@@ -16,14 +15,12 @@
           to="360 20 20"
           dur="0.5s"
           repeatCount="indefinite"/>
-        </path>
-      </svg>
-    </span>
+      </path>
+    </svg>
 
     <!-- 2 -->
-    <span v-else-if="show(2)" class="loader loader--style2">
-      <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+    <svg v-else-if="show(2)" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        :width="svgWidth" :height="svgHeight" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
       <path :fill="color" d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z">
         <animateTransform attributeType="xml"
           attributeName="transform"
@@ -33,13 +30,11 @@
           dur="0.6s"
           repeatCount="indefinite"/>
         </path>
-      </svg>
-    </span>
+    </svg>
 
     <!-- 3  -->
-    <span v-else-if="show(3)" class="loader loader--style3">
-      <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+    <svg version="1.1" v-else-if="show(3)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        :width="svgWidth" :height="svgHeight" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
       <path :fill="color" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
         <animateTransform attributeType="xml"
           attributeName="transform"
@@ -49,134 +44,123 @@
           dur="0.6s"
           repeatCount="indefinite"/>
         </path>
-      </svg>
-    </span>
+    </svg>
 
     <!-- 4 -->
-    <span v-else-if="show(4)" class="loader loader--style4">
-      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" viewBox="0 0 24 24" style="enable-background:new 0 0 50 50;" xml:space="preserve">
-        <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform  attributeType="xml"
-            attributeName="transform" type="scale"
-            values="1,1; 1,3; 1,1"
-            begin="0s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
+    <svg version="1.1" v-else-if="show(4)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      :width="svgWidth" :height="svgHeight" viewBox="0 0 24 24" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform  attributeType="xml"
+          attributeName="transform" type="scale"
+          values="1,1; 1,3; 1,1"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
 
-        <rect x="10" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform  attributeType="xml"
-            attributeName="transform" type="scale"
-            values="1,1; 1,3; 1,1"
-            begin="0.2s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="20" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform  attributeType="xml"
-            attributeName="transform" type="scale"
-            values="1,1; 1,3; 1,1"
-            begin="0.4s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-      </svg>
-    </span>
+      <rect x="10" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform  attributeType="xml"
+          attributeName="transform" type="scale"
+          values="1,1; 1,3; 1,1"
+          begin="0.2s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="20" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform  attributeType="xml"
+          attributeName="transform" type="scale"
+          values="1,1; 1,3; 1,1"
+          begin="0.4s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
 
     <!-- 5 -->
-    <span v-else-if="show(5)" class="loader loader--style5">
-      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" :viewBox="`0 0 ${parseInt(width)} ${parseInt(height)}`" style="enable-background:new 0 0 50 50;" xml:space="preserve">
-        <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform attributeType="xml"
-            attributeName="transform" type="translate"
-            values="0 0; 0 20; 0 0"
-            begin="0" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="10" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform attributeType="xml"
-            attributeName="transform" type="translate"
-            values="0 0; 0 20; 0 0"
-            begin="0.2s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="20" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animateTransform attributeType="xml"
-            attributeName="transform" type="translate"
-            values="0 0; 0 20; 0 0"
-            begin="0.4s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-      </svg>
-    </span>
+    <svg version="1.1" v-else-if="show(5)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      :width="svgWidth" :height="svgHeight" viewBox="0 0 40 40" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform attributeType="xml"
+          attributeName="transform" type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="10" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform attributeType="xml"
+          attributeName="transform" type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0.2s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="20" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animateTransform attributeType="xml"
+          attributeName="transform" type="translate"
+          values="0 0; 0 20; 0 0"
+          begin="0.4s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
 
     <!-- 6 -->
-    <span v-else-if="show(6)" class="loader loader--style6">
-      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" :viewBox="`0 0 ${parseInt(width)} ${parseInt(height)}`" style="enable-background:new 0 0 50 50;" xml:space="preserve">
-        <rect x="0" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="height" attributeType="XML"
-            values="5;21;5"
-            begin="0s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML"
-            values="13; 5; 13"
-            begin="0s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="10" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="height" attributeType="XML"
-            values="5;21;5"
-            begin="0.15s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML"
-            values="13; 5; 13"
-            begin="0.15s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="20" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="height" attributeType="XML"
-            values="5;21;5"
-            begin="0.3s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML"
-            values="13; 5; 13"
-            begin="0.3s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-      </svg>
-    </span>
+    <svg version="1.1" v-else-if="show(6)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      :width="svgWidth" :height="svgHeight" viewBox="0 0 40 40" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="10" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5"
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="20" y="13" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="height" attributeType="XML"
+          values="5;21;5"
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML"
+          values="13; 5; 13"
+          begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
 
     <!-- 7 -->
-    <span v-else-if="show(7)" class="loader loader--style7">
-      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" :viewBox="`0 0 ${parseInt(width)} ${parseInt(height)}`" style="enable-background:new 0 0 50 50;" xml:space="preserve">
-        <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="opacity" attributeType="XML"
-            values="1; .2; 1"
-            begin="0s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="7" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="opacity" attributeType="XML"
-            values="1; .2; 1"
-            begin="0.2s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="14" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
-          <animate attributeName="opacity" attributeType="XML"
-            values="1; .2; 1"
-            begin="0.4s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-      </svg>
-    </span>
+    <svg version="1.1" v-else-if="show(7)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      :width="svgWidth" :height="svgHeight" viewBox="0 0 40 40" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="opacity" attributeType="XML"
+          values="1; .2; 1"
+          begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="7" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="opacity" attributeType="XML"
+          values="1; .2; 1"
+          begin="0.2s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="14" y="0" :width="rectWidth" :height="rectHeight" :fill="color">
+        <animate attributeName="opacity" attributeType="XML"
+          values="1; .2; 1"
+          begin="0.4s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
 
     <!-- 8 -->
-    <span v-else-if="show(8)" class="loader loader--style8">
-      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        :width="width" :height="height" :viewBox="`0 0 ${parseInt(width)} ${parseInt(height)}`" style="enable-background:new 0 0 50 50;" xml:space="preserve">
-        <rect x="0" y="10" :width="rectWidth" :height="rectHeight" :fill="color" opacity="0.2">
-          <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="8" y="10" :width="rectWidth" :height="rectHeight" :fill="color"  opacity="0.2">
-          <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-        <rect x="16" y="10" :width="rectWidth" :height="rectHeight" :fill="color"  opacity="0.2">
-          <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
-          <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
-        </rect>
-      </svg>
-    </span>
+    <svg version="1.1" v-else-if="show(8)" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+      :width="svgWidth" :height="svgHeight" viewBox="0 0 40 40" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+      <rect x="0" y="10" :width="rectWidth" :height="rectHeight" :fill="color" opacity="0.2">
+        <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="8" y="10" :width="rectWidth" :height="rectHeight" :fill="color"  opacity="0.2">
+        <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0.15s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+      <rect x="16" y="10" :width="rectWidth" :height="rectHeight" :fill="color"  opacity="0.2">
+        <animate attributeName="opacity" attributeType="XML" values="0.2; 1; .2" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="height" attributeType="XML" values="10; 20; 10" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+        <animate attributeName="y" attributeType="XML" values="10; 5; 10" begin="0.3s" dur="0.6s" repeatCount="indefinite" />
+      </rect>
+    </svg>
 
     <span v-else>loading ...</span>
 </template>
@@ -192,13 +176,13 @@ export default {
       type: Number,
       default: 1
     },
-    svgHeight: String,
-    svgWidth: String
+    height: String,
+    width: String
   },
   computed: {
-    height() {
-      if (this.svgHeight) {
-        return this.svgHeight;
+    svgHeight() {
+      if (this.height) {
+        return this.height;
       } else {
         switch (this.icon) {
           case 1:
@@ -210,9 +194,9 @@ export default {
         }
       }
     },
-    width() {
-      if (this.svgWidth) {
-        return this.svgWidth;
+    svgWidth() {
+      if (this.width) {
+        return this.width;
       } else {
         switch (this.icon) {
           case 1:
@@ -227,20 +211,20 @@ export default {
       }
     },
     rectWidth() {
-      return parseInt(parseInt(this.width) / 6);
+      return parseInt(parseInt(this.svgWidth) / 6);
     },
     rectHeight() {
       switch (this.icon) {
         case 4:
-          return parseInt(parseInt(this.height) / 3) + 1;
+          return parseInt(parseInt(this.svgHeight) / 3) + 1;
         case 5:
-          return parseInt(parseInt(this.height) / 3);
+          return parseInt(parseInt(this.svgHeight) / 3);
         case 6:
-          return parseInt(parseInt(this.height) / 6);
+          return parseInt(parseInt(this.svgHeight) / 6);
         case 7:
-          return parseInt(parseInt(this.height) / 3) * 2;
+          return parseInt(parseInt(this.svgHeight) / 3) * 2;
         case 8:
-          return parseInt(parseInt(this.height) / 3);
+          return parseInt(parseInt(this.svgHeight) / 3);
       }
     }
   },
@@ -251,17 +235,3 @@ export default {
   }
 };
 </script>
-
-
-<style scoped>
-.loader {
-  margin: 0 0 2em;
-  height: 100px;
-  width: 20%;
-  text-align: center;
-  padding: 1em;
-  margin: 0 auto 1em;
-  display: inline-block;
-  vertical-align: top;
-}
-</style>

@@ -1,3 +1,8 @@
+## 1.3.3
+
+Changed properties `svg-width` and `svg-height` to `width` and `height` respectively on the loading component
+Removed surrounding  span tag on the loading component's svg
+
 ## 1.3.2
 
 Added properties `svg-width` and `svg-height` to the loading component
