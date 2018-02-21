@@ -10,7 +10,7 @@ const VueDoo = {
    * @param {object} options Options for this plugin. Keys include http (object) and store (object)
    * @return {nothing}
    */
-  install(Vue, options) {
+  install: function (Vue, options) {
     if (Vue._vutilv_) {
       return;
     }
@@ -37,7 +37,7 @@ const VueDoo = {
 
     registerComponents(components);
   },
-  store(options, Vue) {
+  store: function (options, Vue) {
     return new Store(options, Vue);
   }
 };
