@@ -10,10 +10,12 @@ const VueDoo = {
    * @param {object} options Options for this plugin. Keys include http (object) and store (object)
    * @return {nothing}
    */
-  install: function (Vue, options = {}) {
+  install(Vue, options) {
     if (Vue._vutilv_) {
       return;
     }
+
+    options = options || {};
 
     Vue._vutilv_ = true;
 
