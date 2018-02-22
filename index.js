@@ -19,17 +19,17 @@ const VueDoo = {
 
     Vue._vutilv_ = true;
 
-    let mixins = new Mixins(Vue, options);
+    var mixins = new Mixins(Vue, options);
 
     // Add mixins
     Vue.mixin(mixins.all());
 
-    let camelToHyphen = str => {
+    var camelToHyphen = str => {
       return str.split(/(?=[A-Z])/).join('-').toLowerCase();
     };
-    let registerComponents = group => {
-      for (let component in group) {
-        let comp = group[component];
+    var registerComponents = group => {
+      for (var component in group) {
+        var comp = group[component];
         Vue.component(camelToHyphen(component), comp);
       }
 
