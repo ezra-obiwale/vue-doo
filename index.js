@@ -24,10 +24,10 @@ const VueDoo = {
     // Add mixins
     Vue.mixin(mixins.all());
 
-    var camelToHyphen = str => {
+    var camelToHyphen = function (str) {
       return str.split(/(?=[A-Z])/).join('-').toLowerCase();
     };
-    var registerComponents = group => {
+    var registerComponents = function (group) {
       for (var component in group) {
         var comp = group[component];
         Vue.component(camelToHyphen(component), comp);
