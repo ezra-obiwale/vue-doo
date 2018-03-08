@@ -86,7 +86,7 @@ app. These packages include:
 
 Shows a loading icon.
 
-Props:
+**Props:**
 
 Name | Required | Default | Description
 -----|----------|---------|------------
@@ -100,11 +100,15 @@ width | no | - | The width of the icon
 A replacement for `router-link` which allows a function to be called on each link
 before being used.
 
+**Props:**
+
 Name | Required | Default | Description
 -----|----------|---------|------------
 to | yes | - | The path to navigate to
 
 #### page-data
+
+**Props:**
 
 Name | Required | Default | Description
 -----|----------|---------|------------
