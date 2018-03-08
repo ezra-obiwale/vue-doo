@@ -82,7 +82,7 @@ app. These packages include:
 
 ### Available components
 
-### loading
+#### loading
 
 Shows a loading icon.
 
@@ -95,7 +95,7 @@ height | no | - | The height of the icon
 icon | no | 1  | The type of icon. 1 - 8
 width | no | - | The width of the icon
 
-### nav-link
+#### nav-link
 
 A replacement for `router-link` which allows a function to be called on each link
 before being used.
@@ -104,7 +104,7 @@ Name | Required | Default | Description
 -----|----------|---------|------------
 to | yes | - | The path to navigate to
 
-### page-data
+#### page-data
 
 Name | Required | Default | Description
 -----|----------|---------|------------
