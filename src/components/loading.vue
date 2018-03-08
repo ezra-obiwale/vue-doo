@@ -172,11 +172,11 @@ export default {
       type: String,
       default: "#333"
     },
+    height: String,
     icon: {
       type: Number,
       default: 1
     },
-    height: String,
     width: String
   },
   computed: {

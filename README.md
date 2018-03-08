@@ -80,6 +80,36 @@ app. These packages include:
 - vuex
 - vuex-persistedstate
 
+### Available components
+
+### loading
+
+Shows a loading icon.
+
+Props:
+
+Name | Required | Default | Description
+-----|----------|---------|------------
+color | no | #333 | The color of the icon
+height | no | - | The height of the icon
+icon | no | 1  | The type of icon. 1 - 8
+width | no | - | The width of the icon
+
+### nav-link
+
+A replacement for `router-link` which allows a function to be called on each link
+before being used.
+
+Name | Required | Default | Description
+-----|----------|---------|------------
+to | yes | - | The path to navigate to
+
+### page-data
+
+Name | Required | Default | Description
+-----|----------|---------|------------
+
+
 ### Global Properties
 
 Two properties are added to all `Vue` instances, thereby making them available
