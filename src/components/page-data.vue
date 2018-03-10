@@ -9,17 +9,19 @@
 import Loading from "./loading";
 export default {
   props: {
-    append: {
-      type: Boolean,
-      default: true
+    buttonClass: {
+      type: String,
+      default: ""
     },
     buttonText: {
       type: String,
       default: "Load More"
     },
-    buttonClass: {
-      type: String,
-      default: "button small"
+    hasNext: {
+      type: Function,
+      default: function() {
+        return true;
+      }
     },
     loadingColor: {
       type: String
@@ -27,6 +29,10 @@ export default {
     loadingIcon: {
       type: Number,
       default: 1
+    },
+    pageKey: {
+      type: String,
+      default: 'page'
     },
     path: {
       required: true,
@@ -36,15 +42,14 @@ export default {
   data() {
     return {
       loading: false,
-      data: [],
-      meta: {}
+      nextPage: 2,
     };
   },
   computed: {
     canLoadMore() {
       return (
         !this.loading &&
-        this.deepValue("pagination.next_page_url", this.meta, false)
+        this.hasNext()
       );
     }
   },
@@ -53,21 +58,19 @@ export default {
   },
   methods: {
     loadMore() {
-      this.load(this.meta.pagination.next_page_url);
+      this.load(`${this.path}?${this.pageKey}=${this.nextPage}`);
     },
     load(url) {
       this.loading = true;
-      this.$http.get(url).then(resp => {
-        this.loading = false;
-        this.set("meta", resp.meta, this);
-        if (this.append) {
-          this.set('data', this.data.concat(resp.data), this);
-        }
-        else {
-          this.set('data', resp.data, this);
-        }
-        this.$emit("dataLoaded", this.data);
-      });
+      this.$http.get(url)
+        .then(resp => {
+          this.$emit('requestOK', resp, this.nextPage - 1);
+          this.nextPage++;
+          this.loading = false;
+        })
+        .catch(resp => {
+          this.$emit('requestError', resp);
+        });
     }
   },
   mounted() {

@@ -88,12 +88,12 @@ Shows a loading icon.
 
 **Props:**
 
-Name | Required | Default | Description
------|----------|---------|------------
-color | no | #333 | The color of the icon
-height | no | - | The height of the icon
-icon | no | 1  | The type of icon. 1 - 8
-width | no | - | The width of the icon
+Name | Type | Required | Default | Description
+-----|------|----------|---------|------------
+color | `string` | no | #333 | The color of the icon
+height | `string` | no | - | The height of the icon
+icon | `integer` | no | 1  | The type of icon. 1 - 8
+width | `string` | no | - | The width of the icon
 
 #### nav-link
 
@@ -102,17 +102,31 @@ before being used.
 
 **Props:**
 
-Name | Required | Default | Description
------|----------|---------|------------
-to | yes | - | The path to navigate to
+Name | Type | Required | Default | Description
+-----|------|----------|---------|------------
+to | `string` | yes | - | The path to navigate to
 
 #### page-data
 
+Fetches the resource at an endpoint and provides a button for fetching subsequent
+pages from the same endpoint when paginated.
+
 **Props:**
 
-Name | Required | Default | Description
------|----------|---------|------------
+Name | Type | Required | Default | Description
+-----|------|----------|---------|------------
+buttonClass | `string` | no | - | The class of the load more button
+buttonText | `string` | no | Load More | The text of the load more button
+hasNext | `function` | no | `function` | The function to call to check if the endpoint has a subsequent page
+loadingColor | `string` | no | - | The color of the loading icon displayed when loading the next page
+loadingIcon | `integer` | no | 1 | The icon to show
+pageKey | `string` | no | page | The key on the `GET` request which holds the desired page
+path | `string` | yes | - | The path to the initial load
 
+**Events**
+
+- **requestOK ( requestResponse, pageNumber )**: Emitted when the request is successful.
+- **requestError ( requestResponse )**: Emitted when the request fails.
 
 ### Global Properties
 
