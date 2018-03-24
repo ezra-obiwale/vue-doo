@@ -1,6 +1,6 @@
 ## 3.0.1
 
-- Check if **config** directory exists before trying to copy the **prod.js** file to it.
+- Check if **config** directory exists before trying to copy the **prod.env.js** file to it.
 
 ## 2.0.0
 
