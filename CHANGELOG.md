@@ -1,3 +1,7 @@
+## 3.0.1
+
+- Check if **config** directory exists before trying to copy the **prod.js** file to it.
+
 ## 2.0.0
 
 - Replaced component `a-link` with `nav-link`

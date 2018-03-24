@@ -19,4 +19,7 @@ if (!fs.existsSync(env_example)) {
 }
 
 copySync('env.example.js', path.join(base_dir, 'env.js'));
-copySync('config.prod.env.js', path.join(base_dir, 'config', 'prod.env.js'), true);
+let config_dir = path.join(base_dir, 'config');
+if (fs.existsSync(config_dir)){
+    copySync('config.prod.env.js', path.join(base_dir, 'config', 'prod.env.js'), true);
+}
