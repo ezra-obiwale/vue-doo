@@ -44,6 +44,7 @@ export default class Http {
   }
 
   reset(options = {}) {
+    this.options = options;
     this.axios = axios.create(options.axios);
     this.emitAjaxEvents = options.ajaxEvents !== false;
   }
@@ -69,7 +70,7 @@ export default class Http {
       }
     };
     return new Promise(function (resolve, reject) {
-      this[type](...args)
+      this.axios[type](...args)
         .then(resp => {
           try {
             beforeResponse();
@@ -81,14 +82,22 @@ export default class Http {
         })
         .catch(error => {
           let resp = error.response;
-          beforeResponse();
-          if (typeof this.options.catchAll == 'function') {
-            this.options.catchAll(...responseParams(resp), reject);
-          }
-          else {
+          try {
+            beforeResponse();
             reject(...responseParams(resp));
           }
+          catch (e) {
+            console.error(e);
+          }
+        })
+        .catch(() => {
+          if (typeof this.options.catchAll == 'function') {
+            this.options.catchAll(...arguments);
+          }
+          else {
+            return Promise.reject(...arguments);
+          }
         });
-    }.bind(this.axios));
+    }.bind(this));
   }
 }
