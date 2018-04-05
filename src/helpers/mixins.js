@@ -243,7 +243,7 @@ export default class {
           return range;
         },
         set(key, value, obj) {
-          if (!key) return;
+          if (key === undefined) return;
           let targets = getTargets(obj, key);
           if (Array.isArray(targets.obj)) {
             targets.obj.splice(targets.key, 1, value);
