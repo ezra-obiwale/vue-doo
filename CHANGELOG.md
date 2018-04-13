@@ -1,3 +1,7 @@
+## 3.0.4
+
+- Accept boolean for `hasNext` prop in component `page-data`.
+
 ## 3.0.1
 
 - Check if **config** directory exists before trying to copy the **prod.env.js** file to it.

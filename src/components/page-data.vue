@@ -18,8 +18,8 @@ export default {
       default: "Load More"
     },
     hasNext: {
-      type: Function,
-      default: function() {
+      type: [Function, Boolean],
+      default: function () {
         return true;
       }
     },
