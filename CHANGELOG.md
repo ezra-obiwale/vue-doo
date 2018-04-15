@@ -1,6 +1,9 @@
 ## 3.0.4
 
 - Accept boolean for `hasNext` prop in component `page-data`.
+- Added prop `data` to component `page-data`.
+- Use real vuex store flow
+- Create function to map vuex to components
 
 ## 3.0.1
 
