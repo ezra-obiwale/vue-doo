@@ -1,11 +1,13 @@
 import Http from './http';
-import Store from './store';
+import OldStore from './store';
 import EventBus from './event-bus';
 import Hello from 'hellojs';
 import Swal from 'sweetalert';
 import Toasted from 'vue-toasted';
-let VueSocialSharing = require('vue-social-sharing');
+import { Store, mapState, mapGetters, mapMutations, mapActions } from 'vuex';
+import createdPersistedState from 'vuex-persistedstate';
 
+let VueSocialSharing = require('vue-social-sharing');
 let getTargets = (obj, key, ignoreDots = false) => {
   if (!ignoreDots && typeof key === 'string' && key.indexOf('.') !== -1) {
     let parts = key.split('.');
@@ -27,19 +29,22 @@ let getTargets = (obj, key, ignoreDots = false) => {
     obj: obj
   };
 };
+
 export default class {
+
   /**
    * Class constructor
    * @param {object} options Keyss include store (object), http (object)
    */
   constructor(Vue, options = {}) {
     this.options = options;
-    this.store = new Store(options.store, Vue);
+    this.store = new OldStore(options.store, Vue);
     Vue.use(Toasted, options.toasts);
     Vue.use(VueSocialSharing)
   }
 
   all() {
+    let mixins = this;
     let options = this.options;
     let AppStore = this.store;
     let deepValue = (target, baseObject, def) => {
@@ -58,11 +63,13 @@ export default class {
       return options.navPath ? options.navPath(path) : path;
     };
 
+
     return {
       beforeCreate() {
         this.$event = EventBus;
         this.$http = new Http(options.http);
         this.$hello = Hello;
+
         let $vm = this;
         this.$nav = {
           path: path,
@@ -77,6 +84,25 @@ export default class {
             return $vm.$router.replace(...args);
           }
         };
+
+        if (!mixins.$store) {
+          mixins.$store = true;
+
+          var store = options.store || {},
+            modules = {};
+          for (var mod in store.modules) {
+            modules[mod] = store.modules[mod];
+            if (typeof store.modules[mod] == 'function') {
+              modules[mod] = modules[mod]($vm);
+            }
+          }
+          mixins.$store = new Store({
+            plugins: [createdPersistedState(store)],
+            modules: modules
+          });
+        }
+
+        this.$store = mixins.$store;
       },
       methods: {
         deepDelete(target, baseObject) {

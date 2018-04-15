@@ -17,6 +17,12 @@ export default {
       type: String,
       default: "Load More"
     },
+    data: {
+      type: Array,
+      default: function() {
+        return [];
+      }
+    },
     hasNext: {
       type: [Function, Boolean],
       default: function () {
@@ -42,7 +48,7 @@ export default {
   data() {
     return {
       loading: false,
-      nextPage: 2,
+      nextPage: 1,
     };
   },
   computed: {
@@ -74,7 +80,9 @@ export default {
     }
   },
   mounted() {
-    this.load(this.path);
+    if (!this.data.length) {
+      this.load(this.path);
+    }
   }
 };
 </script>

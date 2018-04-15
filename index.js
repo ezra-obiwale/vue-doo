@@ -1,8 +1,26 @@
 import Mixins from './src/helpers/mixins';
 import Store from './src/helpers/store';
 import components from './src/components';
+import Vuex from 'vuex';
+import createdPersistedState from 'vuex-persistedstate';
 
 const VueDoo = {
+  componentWithStore(component, { moduleName, states, getters, actions, mutations }) {
+    Object.assign(
+      component.computed,
+      Vuex.mapState(moduleName, states || []),
+      Vuex.mapGetters(moduleName, getters || [])
+    );
+
+    Object.assign(
+      component.methods,
+      Vuex.mapActions(moduleName, actions || []),
+      Vuex.mapMutations(moduleName, mutations || []),
+    );
+
+    return component;
+  },
+
   /**
    * Installs the Vue plugin
    *
@@ -39,7 +57,7 @@ const VueDoo = {
   },
   store: function (options, Vue) {
     return new Store(options, Vue);
-  }
+  },
 };
 
 export default VueDoo;
