@@ -1,3 +1,7 @@
+## 3.0.5
+
+- Check properties `computed` and `methods` exist on components before attaching store
+
 ## 3.0.4
 
 - Accept boolean for `hasNext` prop in component `page-data`.

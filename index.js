@@ -6,12 +6,18 @@ import createdPersistedState from 'vuex-persistedstate';
 
 const VueDoo = {
   componentWithStore(component, { moduleName, states, getters, actions, mutations }) {
+    if (!component.computed) {
+      component.computed = {};
+    }
     Object.assign(
       component.computed,
       Vuex.mapState(moduleName, states || []),
       Vuex.mapGetters(moduleName, getters || [])
     );
 
+    if (!component.methods) {
+      component.methods = {};
+    }
     Object.assign(
       component.methods,
       Vuex.mapActions(moduleName, actions || []),
