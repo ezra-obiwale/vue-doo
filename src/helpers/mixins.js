@@ -43,6 +43,36 @@ export default class {
     Vue.use(VueSocialSharing)
   }
 
+  createStore($vm) {
+    if (!this.$store) {
+      if ($vm) {
+        this.$store = true;
+      }
+
+      let store = this.options.store || {},
+        modules = {};
+      for (let mod in store.modules) {
+        modules[mod] = store.modules[mod];
+        if (typeof store.modules[mod] == 'function') {
+          modules[mod] = modules[mod]($vm);
+        }
+      }
+
+      const $Store = new Store({
+        plugins: [createdPersistedState(store)],
+        modules: modules
+      });
+
+      if (!$vm) {
+        return $Store;
+      }
+
+      this.$store = $Store;
+    }
+
+    return this.$store;
+  }
+
   all() {
     let mixins = this;
     let options = this.options;
@@ -59,10 +89,7 @@ export default class {
       return value !== undefined && value !== null
         ? value : def;
     };
-    let path = path => {
-      return options.navPath ? options.navPath(path) : path;
-    };
-
+    let path = options.navPath || (path => path);
 
     return {
       beforeCreate() {
@@ -75,34 +102,17 @@ export default class {
           path: path,
           push() {
             let args = Array.from(arguments);
-            args[0] = path(args[0]);
+            args[0] = path.call($vm, args[0]);
             return $vm.$router.push(...args);
           },
           replace() {
             let args = Array.from(arguments);
-            args[0] = path(args[0]);
+            args[0] = path.call($vm, args[0]);
             return $vm.$router.replace(...args);
           }
         };
 
-        if (!mixins.$store) {
-          mixins.$store = true;
-
-          var store = options.store || {},
-            modules = {};
-          for (var mod in store.modules) {
-            modules[mod] = store.modules[mod];
-            if (typeof store.modules[mod] == 'function') {
-              modules[mod] = modules[mod]($vm);
-            }
-          }
-          mixins.$store = new Store({
-            plugins: [createdPersistedState(store)],
-            modules: modules
-          });
-        }
-
-        this.$store = mixins.$store;
+        this.$store = mixins.createStore(this);
       },
       methods: {
         deepDelete(target, baseObject) {
