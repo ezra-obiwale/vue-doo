@@ -17,6 +17,10 @@ export default {
       type: String,
       default: "Load More"
     },
+    currentPage: {
+      type: Number,
+      default: 0
+    },
     data: {
       type: Array,
       default: function() {
@@ -48,7 +52,6 @@ export default {
   data() {
     return {
       loading: false,
-      nextPage: 1,
     };
   },
   computed: {
@@ -57,6 +60,9 @@ export default {
         !this.loading &&
         this.hasNext()
       );
+    },
+    nextPage() {
+      return this.currentPage + 1;
     }
   },
   components: {
@@ -70,8 +76,7 @@ export default {
       this.loading = true;
       this.$http.get(url)
         .then(resp => {
-          this.$emit('requestOK', resp, this.nextPage - 1);
-          this.nextPage++;
+          this.$emit('requestOK', resp, this.nextPage);
           this.loading = false;
         })
         .catch(resp => {
@@ -80,7 +85,7 @@ export default {
     }
   },
   mounted() {
-    if (!this.data.length) {
+    if (!this.currentPage && !this.data.length) {
       this.load(this.path);
     }
   }
