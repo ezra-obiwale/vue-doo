@@ -88,6 +88,13 @@ export default {
     if (!this.currentPage && !this.data.length) {
       this.load(this.path);
     }
+  },
+  watch: {
+    currentPage(value) {
+      if (!value) {
+        this.load(this.path);
+      }
+    }
   }
 };
 </script>
