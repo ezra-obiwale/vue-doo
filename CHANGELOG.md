@@ -1,3 +1,9 @@
+# Changelog
+
+## 3.0.6
+
+- PageData component will not load the url if currentPage prop is 0
+
 ## 3.0.5
 
 - Check properties `computed` and `methods` exist on components before attaching store
