@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0
+
+- PageData now overwriting default implementation with the default slot
+
 ## 3.0.6
 
 - PageData component will not load the url if currentPage prop is 0

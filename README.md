@@ -123,6 +123,12 @@ loadingIcon | `integer` | no | 1 | The icon to show
 pageKey | `string` | no | page | The key on the `GET` request which holds the desired page
 path | `string` | yes | - | The path to the initial load
 
+**Slots:**
+
+Name | Scope | Description
+-----|-------|------------
+default | *boolean* canLoadMore, *boolean* isLoading | Overwrites the button and loading icon implementation
+
 **Events**
 
 - **requestOK ( requestResponse, pageNumber )**: Emitted when the request is successful.

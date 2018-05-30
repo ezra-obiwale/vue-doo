@@ -1,7 +1,9 @@
 <template>
   <div>
-    <button v-show="canLoadMore" :class="buttonClass" @click="loadMore">{{ buttonText }}</button>
-    <loading v-show="loading" :icon="loadingIcon" :color="loadingColor"></loading>
+    <slot :can-load-more="canLoadMore" :is-loading="loading">
+      <button v-show="canLoadMore" :class="buttonClass" @click="loadMore">{{ buttonText }}</button>
+      <loading v-show="loading" :icon="loadingIcon" :color="loadingColor"></loading>
+    </slot>
   </div>
 </template>
 
