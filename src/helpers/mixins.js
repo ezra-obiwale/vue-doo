@@ -99,7 +99,9 @@ export default class {
 
         let $vm = this;
         this.$nav = {
-          path: path,
+          path() {
+            return path.call($vm, ...arguments)
+          },
           push() {
             let args = Array.from(arguments);
             args[0] = path.call($vm, args[0]);
