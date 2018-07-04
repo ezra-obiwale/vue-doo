@@ -167,6 +167,7 @@
 
 <script>
 export default {
+  name: 'VdLoading',
   props: {
     color: {
       type: String,
@@ -233,5 +234,5 @@ export default {
       return this.icon === num;
     }
   }
-};
+}
 </script>

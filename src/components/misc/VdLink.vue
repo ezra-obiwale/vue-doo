@@ -1,11 +1,12 @@
 <template>
-  <router-link @click.native="$emit('click', $event)" :to="url">
-    <slot></slot>
+  <router-link @click.native="$emit('click', $event)" :to="path">
+    <slot :path="path"></slot>
   </router-link>
 </template>
 
 <script>
 export default {
+  name: 'VdLink',
   props: {
     to: {
       type: String,
@@ -13,7 +14,7 @@ export default {
     }
   },
   computed: {
-    url() {
+    path() {
       return this.$nav.path(this.to);
     }
   }
