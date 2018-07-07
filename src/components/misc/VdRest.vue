@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot 
+    <slot
       :data="data"
       :loading="loading"
       :working="working"></slot>
@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import store from '../../src/store/rest'
+import store from '../../store/rest'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'VdRest',

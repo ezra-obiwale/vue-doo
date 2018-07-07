@@ -3,7 +3,7 @@
     <template v-for="(field, index) in fields">
       <div
         :key="index"
-        :class="dColumnClass"
+        :class="columnClass"
         v-if="show(field)">
         <slot name="field"
           :data.sync="data[field.name]"
@@ -15,7 +15,7 @@
             :name="field.element.name"
             :default-value="field.element.defaultValue"
             :error="errors[field.name]"
-            :class="dFieldClass"
+            :class="dFieldClass(field)"
             v-bind="field.element.attributes"
             v-model="data[field.name]"
             v-on="events(field)" />
@@ -76,12 +76,6 @@ export default {
   },
   computed: {
     ...mapGetters('allpro-pages', ['currentData']),
-    dColumnClass () {
-      return this.field.columnClass !== undefined ? this.field.columnClass : this.columnClass
-    },
-    dFieldClass () {
-      return this.field.element.class !== undefined ? this.field.element.class : this.fieldClass
-    },
     validator () {
       return this.$v
     }
@@ -101,6 +95,9 @@ export default {
         value = 0
       }
       return value
+    },
+    dFieldClass (field) {
+      return field.element.class !== undefined ? field.element.class : this.fieldClass
     },
     events (field) {
       let fieldEvents = Object.assign({}, field.element.events || {}),

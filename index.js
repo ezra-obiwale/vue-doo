@@ -1,5 +1,4 @@
 import mixins from './src/mixins'
-import components from './src/components'
 
 export default {
 
@@ -20,27 +19,20 @@ export default {
     Vue.mixin(mixins(Vue, options))
 
     if (typeof options.components == 'object') {
-      for (let dir in options.components) {
-        if (Array.isArray(options.components[dir])) {
-          options.components[dir].forEach(componentName => {
-            try {
-              Vue.component(componentName, () => import(`./src/components/${dir}/${componentName}`))
-            } catch (e) {
-              console.error(e)
-            }
-          })
-        }
+      this.components(Vue, options.components)
+    }
+  },
+  components: function (Vue, components) {
+    for (let dir in components) {
+      if (Array.isArray(components[dir])) {
+        components[dir].forEach(componentName => {
+          try {
+            Vue.component(componentName, () => import(`./src/components/${dir}/${componentName}`))
+          } catch (e) {
+            console.error(e)
+          }
+        })
       }
     }
-
-    var registerComponents = function (group) {
-      for (var component in group) {
-        var comp = group[component]
-        Vue.component(camelToHyphen(component), comp)
-      }
-
-    }
-
-    registerComponents(components)
   }
 }

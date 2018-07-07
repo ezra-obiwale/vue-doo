@@ -1,5 +1,5 @@
-import Http from './http'
 import Hello from 'hellojs'
+import Http from '../http'
 import Swal from 'sweetalert'
 import Toasted from 'vue-toasted'
 import WSocket from '../wsocket'
@@ -133,7 +133,7 @@ export default (Vue, options = {}) => {
           parts = target.split('.'),
           last = parts.pop(parts.length - 1),
           next = parts.shift()
-  
+
         if (Array.isArray(baseObject) && next === '*') {
           parts.push(last)
           let joined = parts.join('.')
@@ -152,7 +152,7 @@ export default (Vue, options = {}) => {
               value = value[next]
             next = parts.shift()
           }
-  
+
           if (Array.isArray(value))
             value.splice(last, 1)
           else if (typeof value === 'object')
@@ -187,13 +187,13 @@ export default (Vue, options = {}) => {
         if (sIndex !== -1) {
           domainName = domainName.substr(0, sIndex)
         }
-  
+
         pIndex = domainName.indexOf(':')
         // remove port, if required
         if (removePort && pIndex !== -1) {
           domainName = domainName.substr(0, pIndex)
         }
-  
+
         return domainName
       },
       /**
@@ -210,11 +210,11 @@ export default (Vue, options = {}) => {
         proceed = proceed || (() => {})
         cancel = cancel || (() => {})
         handle = handle || (() => {})
-  
+
         if (!this.$listeners[event]) {
           return handle(proceed, cancel, null, ...params)
         }
-  
+
         this.$emit(event, (resultOrOptions, error) => {
           if (resultOrOptions === undefined) {
             // not handled
@@ -248,7 +248,7 @@ export default (Vue, options = {}) => {
         else {
           is = typeof data === type
         }
-  
+
         return is ? data : def
       },
       /**
@@ -261,13 +261,13 @@ export default (Vue, options = {}) => {
         if (!Array.isArray(keys)) {
           keys = [keys]
         }
-  
+
         let objClone = {}
-  
+
         Object.assign(objClone, obj)
-  
+
         keys.forEach(key => this.deepDelete(key, objClone))
-  
+
         return objClone
       },
       /**
@@ -352,10 +352,10 @@ export default (Vue, options = {}) => {
         if (!Array.isArray(keys)) {
           keys = [keys]
         }
-  
+
         let objClone = {}
         keys.forEach(key => objClone[key] = obj[key])
-  
+
         return objClone
       },
       /**
@@ -364,7 +364,7 @@ export default (Vue, options = {}) => {
        */
       ordinal(num) {
         if (!num && num !== 0) return '';
-  
+
         let ord = 'th';
         if (num < 4 || num > 20) {
           switch (num % 10) {
@@ -412,7 +412,7 @@ export default (Vue, options = {}) => {
        * @param {any} value The value to remove
        * @param {object|array} obj The object to remove from
        * @param {function} func Optional custom function to call on each element. Return TRUE to remove
-       * @returns {any} The removed value 
+       * @returns {any} The removed value
        */
       pullValue (value, obj, func) {
         let pos
@@ -457,7 +457,7 @@ export default (Vue, options = {}) => {
        * @param {boolean} ignoreDots Indicates that the key should be treated as one and not a path
        * @returns {object|array} The object or array given
        */
-      push (value, obj, key, ignoreDots = false) {
+      $push (value, obj, key, ignoreDots = false) {
         let targets = getTargets(obj, key, ignoreDots)
         if (Array.isArray(targets.obj)) {
           if (targets.key === undefined) obj.push(value)
@@ -512,8 +512,17 @@ export default (Vue, options = {}) => {
           targets.obj.splice(targets.key, 1, value)
         }
         else if (targets.obj) {
-          this.push(value, targets.obj, targets.key)
+          this.$push(value, targets.obj, targets.key)
         }
+      },
+      /**
+       * Creates a slug from the given string
+       * @param {string} str The string
+       * @returns {string}
+       */
+      strSlug (str) {
+        return `${str}`.replace(/[^a-z0-9\s]/ig, '')
+          .replace(/\s/g, '-')
       },
       /**
        * Watch file input for changes
@@ -525,14 +534,14 @@ export default (Vue, options = {}) => {
         input.onchange = function () {
           let reader = new FileReader(),
             index = -1;
-  
+
           reader.onload = function (e) {
             // get loaded data and render thumbnail.
             if (typeof callback == 'function') {
               callback(e.target.result, index);
             }
           };
-  
+
           // read the file as a data URL.
           Array.from(this.files).forEach((file, i) => {
             index = i
@@ -543,7 +552,7 @@ export default (Vue, options = {}) => {
     }
   }
 
-  if (config.features.hello) {
+  if (options.features.hello) {
     mixins.hello = Hello.init(deepValue('hello.credentials', options, {}), deepValue('hello.options', options, {}))
     mixins.onHello = callback => {
       Hello.on("auth.login", auth => {
@@ -559,7 +568,7 @@ export default (Vue, options = {}) => {
   if (options.features.sweetalert) {
     mixins.swal = Swal
   }
-  if (config.features.toasts) {
+  if (options.features.toasts) {
     Vue.use(Toasted, typeof options.features.toasts == 'object' ? options.features.toasts : {})
     mixins.toasts = (message, options) => {
       return this.$toasted.show(message, options)
