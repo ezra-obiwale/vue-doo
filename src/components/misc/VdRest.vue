@@ -2,6 +2,7 @@
   <div>
     <slot
       :data="data"
+      :currentData="currentData"
       :loading="loading"
       :working="working"></slot>
   </div>
@@ -22,7 +23,7 @@ export default {
           edit: 'PUT',
           add: 'POST',
           delete: 'DELETE',
-          deleteSelected: 'POST'
+          deleteMany: 'POST'
         }
       },
       validator: function (methods) {
@@ -47,7 +48,7 @@ export default {
           add: 'Save successful',
           edit: 'Save successful',
           delete: 'Delete successful',
-          deleteSelected: 'Delete successful'
+          deleteMany: 'Delete successful'
         }
       }
     },
@@ -57,19 +58,12 @@ export default {
   },
   data () {
     return {
-      formData: {},
+      lastUrl: null,
       loading: false,
       working: false
     }
   },
   computed: {
-    ...mapGetters('vd-rd', {
-      currentData: 'currentData',
-      pagination: 'pagination',
-      storeFilter: 'filter',
-      storeData: 'data',
-      searchQuery: 'searchQuery'
-    }),
     data: {
       get () {
         return this.storeData
@@ -101,10 +95,22 @@ export default {
       }
     }
   },
-  created () {
+  beforeCreate () {
     if (this.$store) {
-      this.$store.registerModule('vd-rd', store, { preserveState: true })
+      this.$store.registerModule('vd-rd', store)
+      this.$options.computed = {
+        ...mapGetters('vd-rd', {
+          currentData: 'currentData',
+          pagination: 'pagination',
+          storeFilter: 'filter',
+          storeData: 'data',
+          searchQuery: 'searchQuery'
+        }),
+      ...this.$options.computed
+      }
     }
+  },
+  created () {
     this.scopeTo(this.collection || Date.now())
 
     if (!this.data.length ||
@@ -182,60 +188,57 @@ export default {
       })
     },
     deleteManyByIds(ids) {
-        this.$q.loading.show()
-        this.emit({
-          event: 'deleteSelected',
-          params: [ids],
-          proceed: resp => {
-            this.emit({
-              event: 'deleteSelectedOK',
-              params: [resp],
-              handle: (proceed, cancel, result) => {
-                proceed(result || resp)
-              },
-              proceed: resp => {
-                this.removeManyByIds(ids)
-              }
-            })
-          },
-          cancel: resp => {
-            this.working = false
-            if (resp === false) {
-              return
-            }
-            this.emit({
-              event: 'deleteSelectedError',
-              params: [resp],
-              handle: (proceed, cancel, result) => {
-                proceed(result || resp)
-              },
-              proceed: resp => {
-                this.processErrors(resp)
-              }
-            })
-          },
-          handle: (proceed, cancel) => {
-            if (!this.url) {
+      this.$q.loading.show()
+      this.emit({
+        event: 'deleteMany',
+        params: [ids],
+        proceed: resp => {
+          this.emit({
+            event: 'deleteManyOK',
+            params: [resp],
+            handle: (proceed, cancel, result) => {
+              proceed(result || resp)
+            },
+            proceed: resp => {
               this.removeManyByIds(ids)
-              return this.$emit('deleteSelectedOK', () => {
-              }, ids, true)
             }
-            let method = this.breadMethods['deleteSelected'] || 'post'
-            this.$http[method.toLowerCase()](this.withSlash() + 'delete-many', {
-              ids: ids
-            })
-            .then(proceed)
-            .catch(cancel)
+          })
+        },
+        cancel: resp => {
+          this.working = false
+          if (resp === false) {
+            return
           }
-        })
+          this.emit({
+            event: 'deleteManyError',
+            params: [resp],
+            handle: (proceed, cancel, result) => {
+              proceed(result || resp)
+            },
+            proceed: resp => {
+              this.processErrors(resp)
+            }
+          })
+        },
+        handle: (proceed, cancel) => {
+          if (!this.url) {
+            this.removeManyByIds(ids)
+            return this.$emit('deleteManyOK', () => {
+            }, ids, true)
+          }
+          let method = this.breadMethods['deleteMany'] || 'post'
+          this.$http[method.toLowerCase()](this.withSlash() + 'delete-many', {
+            ids: ids
+          })
+          .then(proceed)
+          .catch(cancel)
+        }
+      })
     },
     getData(id, index) {
       return index !== undefined
         ? this.storeData[index]
         : this.storeData.find(data => data.id === id)
-    },
-    hideFormModal () {
-      this.canShowFormModal = false
     },
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination
@@ -279,9 +282,17 @@ export default {
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
-        handle: (proceed, cancel, resultUrl, fullUrl) => {
+        handle: (proceed, cancel, resultUrl) => {
           let method = this.breadMethods['browse'] || 'get'
-          this.$http[method.toLowerCase()](resultUrl || fullUrl)
+          if (!resultUrl) {
+            resultUrl = fullUrl
+          }
+          if (this.lastUrl == fullUrl) {
+            this.loading = false
+            return
+          }
+          this.lastUrl = fullUrl
+          this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
             .catch(cancel)
         },
@@ -340,7 +351,15 @@ export default {
         params: [id, url],
         handle: (proceed, cancel, resultUrl) => {
           let method = this.breadMethods['read'] || 'get'
-          this.$http[method.toLowerCase()](resultUrl || url)
+          if (!resultUrl) {
+            resultUrl = fullUrl
+          }
+          if (this.lastUrl == resultUrl) {
+            this.loading = false
+            return
+          }
+          this.lastUrl = resultUrl
+          this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
             .catch(cancel)
         },
@@ -387,21 +406,21 @@ export default {
       this.resetData()
       this.loadMany()
     },
-    save() {
+    save(formData) {
       this.working = true
       if (this.formModal.handler) {
         return this.formModal.handler(() => {
           this.working = false
         }, {
           form: this.$refs.formModalForm,
-          currentData: this.formData
+          currentData: formData
         })
       }
       else if (!this.url) {
-        if (!this.formData.id) {
+        if (!formData.id) {
           this.emit({
             event: 'addData',
-            params: [this.formData, true],
+            params: [formData, true],
             handle: (proceed, cancel, result) => {
               proceed(result || resp)
             },
@@ -431,7 +450,7 @@ export default {
         else {
           this.emit({
             event: 'editData',
-            params: [this.formData, true],
+            params: [formData, true],
             handle: (proceed, cancel, result) => {
               proceed(result || resp)
             },
@@ -450,18 +469,18 @@ export default {
 
       let action = 'add',
         url = this.withSlash()
-      if (this.formData.id) {
+      if (formData.id) {
         action = 'edit'
-        url += this.formData.id
+        url += formData.id
       }
 
       this.emit({
         event: `${action}Data`,
-        params: [this.formData, this.$refs.formModalForm],
+        params: [formData, this.$refs.formModalForm],
         handle: (proceed, cancel, result) => {
           let _action = this.breadMethods[action].toLowerCase()
           let data = _action == 'put'
-            ? (result || this.formData)
+            ? (result || formData)
             : new FormData(this.$refs.formModalForm)
           this.$http[_action]
             (url, data)
@@ -512,85 +531,6 @@ export default {
     searchQueryChanged(query) {
       this.search = query
     },
-    showFormModal() {
-      this.canShowFormModal = true
-    },
-    tableRowActions() {
-      let buttons = []
-      if (this.table.rowActions !== false) {
-        let rowActions = {},
-          standard = ['view', 'edit', 'delete']
-        if (typeof this.table.rowActions == 'function') {
-          rowActions = this.table.rowActions(...arguments)
-        } else if (typeof this.table.rowActions == 'object') {
-          rowActions = this.table.rowActions
-        }
-        standard.forEach(action => {
-          if (rowActions[action] === undefined) {
-            rowActions[action] = true
-          }
-        })
-
-        const ucfirst = str => str[0].toUpperCase() + str.substr(1)
-
-        for (let action in rowActions) {
-          if (action == 'custom') {
-            continue
-          }
-          let rowAction = rowActions[action],
-            button = Object.assign({}, rowAction)
-          if (rowAction !== false) {
-            if (typeof button !== 'object') {
-              button = {}
-            }
-
-            button.text = button.text || ucfirst(action)
-            let defaultIcon = ''
-            switch (action) {
-              case 'view':
-                defaultIcon = 'folder_open'
-                break;
-              case 'edit':
-                defaultIcon = 'edit'
-                break;
-              case 'delete':
-                defaultIcon = 'delete'
-                break;
-            }
-            if (!button.icon && button.icon !== false) {
-              button.icon = defaultIcon
-            }
-            button.handler = button.handler || ((row) => {
-              let handle = status => {
-                if (status !== false) {
-                  if (action == 'delete') {
-                    this.delete(row.id, row.__index)
-                  }
-                  else {
-                    this.setCurrentData(row)
-                    if (this.$refs.formModal) {
-                      this.$refs.formModal.show()
-                    }
-                  }
-                }
-              }
-              if (typeof rowAction.handler == 'function') {
-                rowAction.handler(handle, row)
-              }
-              else {
-                handle()
-              }
-            })
-
-            buttons.push(button)
-          }
-        }
-
-        return [...buttons, ...(rowActions.custom || [])]
-      }
-
-      return buttons
-    },
     urlChanged () {
       if (this.readOnlyId) {
         this.loadOne(this.readOnlyId)
@@ -609,29 +549,16 @@ export default {
     currentData: {
       deep: true,
       handler(data) {
-        this.$set(this, 'formData', { ...data })
         this.$emit('currentDataUpdated', data)
       }
     },
-    formData: {
-      deep: true,
-      handler(data) {
-        this.$emit('formDataUpdated', data)
-      }
-    },
-    id (id) {
+    readOnlyId (id) {
       this.urlChanged()
     },
     search (newSearch, oldSearch) {
       if (oldSearch && !newSearch) {
         this.loadMany()
       }
-    },
-    subtitle (subtitle) {
-      this.setHeaderSubtitle(subtitle)
-    },
-    title (title) {
-      this.setHeaderTitle(title)
     },
     url () {
       this.urlChanged()
