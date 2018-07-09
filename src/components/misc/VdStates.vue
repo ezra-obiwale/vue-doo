@@ -1,44 +1,54 @@
 <template>
-  <div>
-    <slot
-      :error="error"
-      :states="states"
-      :loading="loading"
-      :message="message"
-      :options="stateOptions">
-      <select
-        v-bind="$attrs"
-        v-on="$listeners"
-        :class="$attrs.class"
-        @click="reload"
-        @change="changed" >
-        <option value="" v-if="message">
-          {{ message }}
-        </option>
-        <template v-else 
-          v-for="option in stateOptions">
-          <option v-if="option.id == value"
-            selected="selected"
-            :value="option.id"
-            :key="option.id">
-            {{ option.name }}
-          </option>
-          <option v-else
-            :value="option.id"
-            :key="option.id">
-            {{ option.name }}
-          </option>
-        </template>
-      </select>
-    </slot>
-  </div>
+  <component
+    v-if="this.component"
+    :is="this.component"
+    v-bind="customBind"
+    v-on="$listeners"
+    v-model="value"
+    @click="reload"
+    :error="error"
+    :states="states"
+    :loading="loading"
+    :message="message"
+    :options="stateOptions" />
+  <select
+    v-else
+    v-bind="$attrs"
+    v-on="$listeners"
+    :class="$attrs.class"
+    @click="reload"
+    @change="changed" >
+    <option value="" v-if="message">
+      {{ message }}
+    </option>
+    <template v-else
+      v-for="option in stateOptions">
+      <option v-if="option.id == value"
+        selected="selected"
+        :value="option.id"
+        :key="option.id">
+        {{ option.name }}
+      </option>
+      <option v-else
+        :value="option.id"
+        :key="option.id">
+        {{ option.name }}
+      </option>
+    </template>
+  </select>
 </template>
 
 <script>
 export default {
   name: 'VdStates',
-  inheritAttrs: false,
   props: {
+    bind: {
+      type: Function,
+      default: () => ({})
+    },
+    component: {
+      type: [Object, String]
+    },
     loadErrorMessage: {
       type: String,
       default: 'Load failed!'
@@ -60,6 +70,13 @@ export default {
     }
   },
   computed: {
+    customBind () {
+      let attrs = this.$attrs,
+        customAttrs = this.bind(this)
+      return typeof customAttrs == 'object'
+        ? Object.assign({}, attrs, customAttrs)
+        : attrs
+    },
     stateOptions () {
       let options = []
       for (let id in this.states) {
@@ -99,6 +116,7 @@ export default {
         })
     },
     reload () {
+      alert()
       if (this.error) {
         this.error = false
         this.load()

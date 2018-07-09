@@ -2,7 +2,6 @@
   <component
     :is="name"
     :id="id"
-    inverted-light
     :name="cleanName(id)"
     :value="value"
     v-bind="$attrs"

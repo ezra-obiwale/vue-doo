@@ -27,7 +27,7 @@ export default {
       if (Array.isArray(components[dir])) {
         components[dir].forEach(componentName => {
           try {
-            Vue.component(componentName, () => import(`./src/components/${dir}/${componentName}`))
+            Vue.component(componentName, () => import(`./src/components/${dir}/${componentName}.vue`))
           } catch (e) {
             console.error(e)
           }

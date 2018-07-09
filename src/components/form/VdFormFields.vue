@@ -3,7 +3,7 @@
     <template v-for="(field, index) in fields">
       <div
         :key="index"
-        :class="columnClass"
+        :class="field.columnClass || columnClass"
         v-if="show(field)">
         <slot name="field"
           :data.sync="data[field.name]"
@@ -16,7 +16,7 @@
             :default-value="field.element.defaultValue"
             :error="errors[field.name]"
             :class="dFieldClass(field)"
-            v-bind="field.element.attributes"
+            v-bind="field.element.attributes || {}"
             v-model="data[field.name]"
             v-on="events(field)" />
         </slot>
@@ -72,7 +72,7 @@ export default {
     return this.validations
   },
   components: {
-    VdFormField: () => import("./VdFormField")
+    VdFormField: () => import("./VdFormField.vue")
   },
   computed: {
     ...mapGetters('allpro-pages', ['currentData']),

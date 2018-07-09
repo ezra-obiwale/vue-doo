@@ -108,6 +108,21 @@ export default (Vue, options = {}) => {
     },
     methods: {
       /**
+       * Fetches the css classes on the current component as an object
+       * @returns {object}
+       */
+      classObject () {
+        let css = {}
+        if (typeof this.$attrs.class === 'string') {
+          this.$attrs.class.replace(/\s\s/gi, ' ')
+            .split(' ')
+            .forEach(className => cls[className.trim()] = true)
+        } else if (typeof this.$attrs.class == 'object') {
+          css = this.$attrs.class
+        }
+        return css
+      },
+      /**
        * Handles click event for an a element
        * @param {object} e The event object
        * @param {string} link The link to connect to
@@ -523,6 +538,23 @@ export default (Vue, options = {}) => {
       strSlug (str) {
         return `${str}`.replace(/[^a-z0-9\s]/ig, '')
           .replace(/\s/g, '-')
+      },
+      /**
+       * Fetches the styles on the current component as an object
+       * @returns {object}
+       */
+      styleObject () {
+        let style = {}
+        if (typeof this.$attrs.style === 'string') {
+          this.$attrs.style.split(';')
+            .forEach(pair => {
+              let parts = pair.split(':')
+              style[parts[0].trim()] = parts[1].trim()
+            })
+        } else if (typeof this.$attrs.style == 'object') {
+          style = this.$attrs.style
+        }
+        return style
       },
       /**
        * Watch file input for changes
