@@ -1,5 +1,5 @@
 export const scope = (state) => {
-  return state.pageIndex > -1
-    ? state.pages[state.pageIndex]
-    : state.pageDefault
+  return state.collectionIndex > -1
+    ? state.collections[state.collectionIndex]
+    : state.collectionDefault
 }

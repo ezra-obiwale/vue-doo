@@ -37,6 +37,10 @@ export default {
       type: String,
       default: ''
     },
+    dummyData: {
+      type: [Array, Boolean],
+      default: false
+    },
     readOnlyId: {
       type: [Number, String],
       default: 0
@@ -69,8 +73,8 @@ export default {
         return this.storeData
       },
       set (data) {
-        if (this.defaultData) {
-          return this.defaultData = data
+        if (Array.isArray(this.dummyData)) {
+          return this.dummyData = data
         }
         return this.setData(data)
       }
@@ -187,8 +191,7 @@ export default {
         }
       })
     },
-    deleteManyByIds(ids) {
-      this.$q.loading.show()
+    deleteMany(ids) {
       this.emit({
         event: 'deleteMany',
         params: [ids],
@@ -206,25 +209,15 @@ export default {
         },
         cancel: resp => {
           this.working = false
-          if (resp === false) {
-            return
-          }
           this.emit({
             event: 'deleteManyError',
-            params: [resp],
-            handle: (proceed, cancel, result) => {
-              proceed(result || resp)
-            },
-            proceed: resp => {
-              this.processErrors(resp)
-            }
+            params: [resp]
           })
         },
         handle: (proceed, cancel) => {
           if (!this.url) {
             this.removeManyByIds(ids)
-            return this.$emit('deleteManyOK', () => {
-            }, ids, true)
+            return this.$emit('deleteManyOK', () => {}, ids, true)
           }
           let method = this.breadMethods['deleteMany'] || 'post'
           this.$http[method.toLowerCase()](this.withSlash() + 'delete-many', {
@@ -243,14 +236,12 @@ export default {
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination
       if (!this.url) {
-        if (this.defaultData) {
-          if (!this.data.length) {
-            this.loadData({
-              data: this.defaultData,
-              pagination,
-              total: this.defaultData.length
-            })
-          }
+        if (this.dummyData && !this.data.length) {
+          this.loadData({
+            data: this.dummyData,
+            pagination,
+            total: this.dummyData.length
+          })
         }
         return this.$emit('loadManyOK', () => {}, this.data, true)
       }
@@ -313,7 +304,6 @@ export default {
                 pagination,
                 total: this.deepValue('meta.total', resp, 0)
               })
-              this.canShowFormModal = false
             }
           })
         },
@@ -406,17 +396,9 @@ export default {
       this.resetData()
       this.loadMany()
     },
-    save(formData) {
+    save(formData, htmlForm) {
       this.working = true
-      if (this.formModal.handler) {
-        return this.formModal.handler(() => {
-          this.working = false
-        }, {
-          form: this.$refs.formModalForm,
-          currentData: formData
-        })
-      }
-      else if (!this.url) {
+      if (!this.url) {
         if (!formData.id) {
           this.emit({
             event: 'addData',
@@ -427,7 +409,6 @@ export default {
             proceed: formData => {
               this.working = false
               this.addData({ id: Date.now(), ...formData })
-              this.canShowFormModal = false
               this.emit({
                 event: 'addDataOK',
                 params: [formData, true],
@@ -456,7 +437,6 @@ export default {
             },
             proceed: formData => {
               this.updateData(Object.assign({}, formData))
-              this.canShowFormModal = false
               this.emit({
                 event: 'editDataOK',
                 params: [formData, true]
@@ -476,12 +456,12 @@ export default {
 
       this.emit({
         event: `${action}Data`,
-        params: [formData, this.$refs.formModalForm],
+        params: [formData, htmlForm],
         handle: (proceed, cancel, result) => {
           let _action = this.breadMethods[action].toLowerCase()
-          let data = _action == 'put'
+          let data = _action == 'put' || !htmlForm
             ? (result || formData)
-            : new FormData(this.$refs.formModalForm)
+            : new FormData(htmlForm)
           this.$http[_action]
             (url, data)
             .then(proceed)
@@ -503,8 +483,6 @@ export default {
                 this.updateData(resp.data)
               }
               this.working = false
-              this.canShowFormModal = false
-              this.$refs.formModalForm.reset()
             }
           })
         },

@@ -75,7 +75,6 @@ export default {
     VdFormField: () => import("./VdFormField.vue")
   },
   computed: {
-    ...mapGetters('allpro-pages', ['currentData']),
     validator () {
       return this.$v
     }
