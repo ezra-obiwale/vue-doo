@@ -101,17 +101,29 @@ export default {
     events (field) {
       let fieldEvents = Object.assign({}, field.element.events || {}),
         events = {
-          blur: () => {
+          blur: (value) => {
             this.touch(field.name)
             if (typeof this.deepValue('element.events.blur', field) == 'function') {
-              field.element.events.blur(...arguments)
+              field.element.events.blur(value)
             }
           },
-          input: () => {
+          change: (value) => {
+            this.touch(field.name)
+            if (typeof this.deepValue('element.events.change', field) == 'function') {
+              field.element.events.change(...arguments)
+            }
+            let data = { ...this.data }
+            data[field.name] = value
+            this.$emit('change', data)
+          },
+          input: (value) => {
             this.touch(field.name)
             if (typeof this.deepValue('element.events.input', field) == 'function') {
               field.element.events.input(...arguments)
             }
+            let data = { ...this.data }
+            data[field.name] = value
+            this.$emit('input', data)
           }
         }
 
@@ -186,13 +198,6 @@ export default {
     })
   },
   watch: {
-    data: {
-      deep: true,
-      handler(value) {
-        this.$emit('change', value)
-        this.$emit('input', value)
-      }
-    },
     validator: {
       deep: true,
       handler(validations) {

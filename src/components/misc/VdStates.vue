@@ -4,7 +4,7 @@
     :is="this.component"
     v-bind="customBind"
     v-on="$listeners"
-    v-model="value"
+    v-model="model"
     @click="reload"
     :error="error"
     :states="states"
@@ -77,6 +77,21 @@ export default {
         ? Object.assign({}, attrs, customAttrs)
         : attrs
     },
+    message () {
+      if (this.loading) {
+        return this.loadingMessage
+      } else if (this.error) {
+        return this.loadErrorMessage
+      }
+    },
+    model: {
+      get () {
+        return this.value
+      },
+      set (value) {
+        this.$emit('change', value)
+      }
+    },
     stateOptions () {
       let options = []
       for (let id in this.states) {
@@ -86,13 +101,6 @@ export default {
         })
       }
       return options
-    },
-    message () {
-      if (this.loading) {
-        return this.loadingMessage
-      } else if (this.error) {
-        return this.loadErrorMessage
-      }
     }
   },
   created () {

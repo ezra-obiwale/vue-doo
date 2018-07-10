@@ -4,7 +4,7 @@
     :is="this.component"
     v-bind="customBind"
     v-on="$listeners"
-    v-model="value"
+    v-model="model"
     @click="reload"
     :error="error"
     :lgas="lgas"
@@ -17,7 +17,7 @@
     v-on="$listeners"
     :class="$attrs.class"
     @click="reload"
-    @change="changed" >
+    @change="changed">
     <option value="" v-if="message">
       {{ message }}
     </option>
@@ -103,6 +103,14 @@ export default {
         return this.loadingMessage
       } else if (this.error) {
         return this.loadErrorMessage
+      }
+    },
+    model: {
+      get () {
+        return this.value
+      },
+      set (value) {
+        this.$emit('change', value)
       }
     }
   },
