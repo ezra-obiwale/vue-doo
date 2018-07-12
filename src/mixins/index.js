@@ -424,32 +424,33 @@ export default (Vue, options = {}) => {
       },
       /**
        * Reactively removes a value from an object or array
-       * @param {any} value The value to remove
+       * @param {any} valueOrFunc The value to remove or a function that receives each item and its key in obj. The function should return true if the value should be removed
        * @param {object|array} obj The object to remove from
-       * @param {function} func Optional custom function to call on each element. Return TRUE to remove
        * @returns {any} The removed value
        */
-      pullValue (value, obj, func) {
+      pullValue (valueOrFunc, obj) {
         let pos
-        if (value === undefined || !obj) return
+        if (valueOrFunc === undefined || !obj) return
 
         if (Array.isArray(obj)) {
-          pos = func ? obj.findIndex(func) : obj.indexOf(value)
+          pos = typeof valueOrFunc == 'function'
+            ? obj.findIndex(valueOrFunc)
+            : obj.indexOf(valueOrFunc)
           if (pos === -1) return
         }
         else if (obj) {
           for (let a in obj) {
-            if (func) {
-              let ps = func(obj[a], a)
+            if (typeof valueOrFunc == 'function') {
+              let ps = valueOrFunc(obj[a], a)
               if (ps) {
                 pos = a
                 break
               }
             }
             else {
-              let _value = typeof value === 'object'
-                ? JSON.stringify(value)
-                : value
+              let _value = typeof valueOrFunc === 'object'
+                ? JSON.stringify(valueOrFunc)
+                : valueOrFunc
               let _value2 = typeof obj[a] === 'object'
                 ? JSON.stringify(obj[a])
                 : obj[a]
@@ -472,7 +473,7 @@ export default (Vue, options = {}) => {
        * @param {boolean} ignoreDots Indicates that the key should be treated as one and not a path
        * @returns {object|array} The object or array given
        */
-      $push (value, obj, key, ignoreDots = false) {
+      $push (key, obj, value, ignoreDots = false) {
         let targets = getTargets(obj, key, ignoreDots)
         if (Array.isArray(targets.obj)) {
           if (targets.key === undefined) obj.push(value)
@@ -520,7 +521,7 @@ export default (Vue, options = {}) => {
        * @param {object|array} obj The object or array
        * @returns {nothing}
        */
-      set (key, value, obj) {
+      set (key, obj, value) {
         if (key === undefined) return
         let targets = getTargets(obj, key)
         if (Array.isArray(targets.obj)) {
@@ -579,7 +580,7 @@ export default (Vue, options = {}) => {
             index = i
             reader.readAsDataURL(file);
           })
-        };
+        }
       }
     }
   }

@@ -112,18 +112,16 @@ export default {
             if (typeof this.deepValue('element.events.change', field) == 'function') {
               field.element.events.change(...arguments)
             }
-            let data = { ...this.data }
-            data[field.name] = value
-            this.$emit('change', data)
+            this.data[field.name] = value
+            this.$emit('change', this.data)
           },
           input: (value) => {
             this.touch(field.name)
             if (typeof this.deepValue('element.events.input', field) == 'function') {
               field.element.events.input(...arguments)
             }
-            let data = { ...this.data }
-            data[field.name] = value
-            this.$emit('input', data)
+            this.data[field.name] = value
+            this.$emit('input', this.data)
           }
         }
 
