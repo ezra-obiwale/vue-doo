@@ -37,6 +37,10 @@ export default {
       type: String,
       default: ''
     },
+    currentPage: {
+      type: Number,
+      default: 0
+    },
     dummyData: {
       type: [Array, Boolean],
       default: false
@@ -55,6 +59,10 @@ export default {
           deleteMany: 'Delete successful'
         }
       }
+    },
+    totalRowsCount: {
+      type: [Function, Number],
+      default: 0
     },
     url: {
       type: String
@@ -139,8 +147,11 @@ export default {
       scopeTo: 'SCOPE_TO',
       setCurrentData: 'SET_CURRENT_DATA',
       setCurrentDataById: 'SET_CURRENT_DATA_BY_ID',
+      setCurrentDataPage: 'SET_CURRENT_DATA_PAGE',
       setFilter: 'SET_FILTER',
-      updateData: 'UPDATE_CURRENT_DATA'
+      setRowsCount: 'SET_ROWS_NUMBER',
+      updateData: 'UPDATE_CURRENT_DATA',
+      updateRowsPerPage: 'UPDATE_ROWS_PER_PAGE'
     }),
     delete (id, index) {
       let row = this.getData(id, index)
@@ -270,6 +281,8 @@ export default {
         fullUrl += `&length=${pagination.rowsPerPage}`
       }
 
+      this.updateRowsPerPage(pagination.rowsPerPage)
+
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
@@ -301,11 +314,16 @@ export default {
               }
               this.loadData({
                 data: resp.data,
-                pagination,
-                total: this.deepValue('meta.total', resp, 0)
+                pagination
               })
             }
           })
+          if (typeof this.totalRowsCount == 'function') {
+            let count = this.totalRowsCount(resp)
+            if (count !== undefined) {
+              this.setRowsCount(count)
+            }
+          }
         },
         cancel: resp => {
           this.loading = false
@@ -524,11 +542,17 @@ export default {
     }
   },
   watch: {
+    collection () {
+      this.urlChanged()
+    },
     currentData: {
       deep: true,
       handler(data) {
         this.$emit('currentDataUpdated', data)
       }
+    },
+    currentPage (page) {
+      this.setCurrentDataPage(page)
     },
     readOnlyId (id) {
       this.urlChanged()
@@ -537,6 +561,9 @@ export default {
       if (oldSearch && !newSearch) {
         this.loadMany()
       }
+    },
+    totalRowsCount (count) {
+      this.setRowsCount(count)
     },
     url () {
       this.urlChanged()

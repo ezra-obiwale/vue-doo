@@ -11,9 +11,8 @@ export const CHANGE_SEARCH_QUERY = (state, query) => {
   RESET_SCOPE(state)
 }
 
-export const LOAD_DATA = (state, { data, pagination, total }) => {
+export const LOAD_DATA = (state, { data, pagination }) => {
   scope(state).data = scope(state).data.concat(data)
-  pagination.rowsNumber = total || scope(state).pagination.rowsNumber
   scope(state).pagination = pagination
   RESET_SCOPE(state)
 }
@@ -48,17 +47,28 @@ export const RESET_CURRENT_DATA = state => {
 
 export const RESET_DATA = (state) => {
   let newScope = {}
-  Object.assign(newScope, state.collectionDefault)
+  Object.assign(newScope, state.pageDefault)
   newScope.id = scope(state).id
   newScope.searchQuery = scope(state).searchQuery
   newScope.filter = scope(state).filter
-  state.collections.splice(state.collectionIndex, 1, newScope)
+  state.pages.splice(state.pageIndex, 1, newScope)
   RESET_SCOPE(state)
 }
 
 const RESET_SCOPE = state => {
-  if (state.previousCollectionIndex > -1) {
-    state.collectionIndex = state.previousCollectionIndex
+  if (state.previousPageIndex > -1) {
+    state.pageIndex = state.previousPageIndex
+  }
+}
+
+export const SCOPE_TO = (state, id) => {
+  state.pageIndex = state.pages.findIndex(page => page.id == id)
+  if (state.pageIndex == -1) {
+    let page = {}
+    Object.assign(page, state.pageDefault)
+    page.id = id
+    state.pages.push(page)
+    state.pageIndex = state.pages.length - 1
   }
 }
 
@@ -74,24 +84,23 @@ export const SET_CURRENT_DATA_BY_ID = (state, id) => {
   SET_CURRENT_DATA(state, data)
 }
 
+export const SET_CURRENT_DATA_PAGE = (state, page) => {
+  scope(state).pagination.page = page
+  RESET_SCOPE(state)
+}
+
 export const SET_FILTER = (state, filter) => {
   Vue.set(scope(state), 'filter', filter)
   RESET_SCOPE(state)
 }
 
-export const SCOPE_TO = (state, id) => {
-  state.collectionIndex = state.collections.findIndex(collection => collection.id == id)
-  if (state.collectionIndex == -1) {
-    let collection = {}
-    Object.assign(collection, state.collectionDefault)
-    collection.id = id
-    state.collections.push(collection)
-    state.collectionIndex = state.collections.length - 1
-  }
+export const SET_ROWS_NUMBER = (state, number) => {
+  scope(state).pagination.rowsNumber = number
+  RESET_SCOPE(state)
 }
 
 export const TEMP_SCOPE_TO = (state, id) => {
-  state.previousCollectionIndex = state.collectionIndex
+  state.previousPageIndex = state.pageIndex
   SCOPE_TO(state, id)
 }
 
@@ -103,5 +112,10 @@ export const UPDATE_ON_CURRENT_DATA = (state, { name, value }) => {
 export const UPDATE_CURRENT_DATA = (state, data) => {
   scope(state).data.splice(scope(state).currentDataIndex, 1, data)
   SET_CURRENT_DATA(state, data)
+  RESET_SCOPE(state)
+}
+
+export const UPDATE_ROWS_PER_PAGE = (state, rows) => {
+  scope(state).pagination.rowsPerPage = rows
   RESET_SCOPE(state)
 }

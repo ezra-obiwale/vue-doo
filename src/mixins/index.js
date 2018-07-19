@@ -108,6 +108,15 @@ export default (Vue, options = {}) => {
     },
     methods: {
       /**
+       * Returns the function or the default function if the first is not a function
+       * @param {function} func The function
+       * @param {function} defFunc The default function
+       * @returns {function}
+       */
+      callable (func, defFunc) {
+        return typeof func == 'function' ? func : (defFunc || (() => {}))
+      },
+      /**
        * Fetches the css classes on the current component as an object
        * @returns {object}
        */
@@ -136,6 +145,36 @@ export default (Vue, options = {}) => {
         else if (link.indexOf('://') === -1) {
           this.$router.push(link)
         }
+      },
+      /**
+       * Turns a number to a currency
+       * @param {number|string} amount The number
+       * @param {string} separator The separator. Defaults to comma (,)
+       * @returns {string}
+       */
+      currency (amount, separator = ',') {
+        // ensure positive sign and turn to string
+        let amtStr = `${Math.abs(amount)}`,
+          // get dot position
+          dotPos = amtStr.indexOf('.'),
+          // turn string without dot to array
+          amtArr = dotPos > -1 ? amtStr.substr(0, dotPos).split('') : amtStr.split(''),
+          // find the first separator position
+          sepPos = amtArr.length % 3
+        // set first separator position if 0
+        if (!sepPos) {
+          sepPos = 3
+        }
+        while (sepPos < amtArr.length) {
+          // add separator
+          amtArr.splice(sepPos, 0, separator)
+          // set next position for currency
+          sepPos += 4
+        }
+        // get currency string and ensure correct sign
+        let cur = parseFloat(amount) < 0 ? '-' + amtArr.join('') : amtArr.join('')
+        // append decimal value and return currency
+        return dotPos > -1 ? cur + amtStr.substr(dotPos) : cur
       },
       /**
        * Delete a key from an object

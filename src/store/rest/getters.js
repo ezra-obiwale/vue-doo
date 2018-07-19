@@ -6,4 +6,3 @@ export const data = state => scope(state).data
 export const filter = state => scope(state).filter
 export const pagination = state => scope(state).pagination
 export const searchQuery = state => scope(state).searchQuery
-

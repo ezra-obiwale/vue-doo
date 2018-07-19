@@ -17,7 +17,7 @@
             :error="errors[field.name]"
             :class="dFieldClass(field)"
             v-bind="field.element.attributes || {}"
-            v-model="data[field.name]"
+            v-model="data[field.dataKey || field.name]"
             v-on="events(field)" />
         </slot>
         <input
@@ -87,7 +87,7 @@ export default {
       return field.name
     },
     cleanValue (field) {
-      let value = this.data[field.name]
+      let value = this.data[field.dataKey || field.name]
       if (value === true) {
         value = 1
       } else if (value === false) {
@@ -180,10 +180,10 @@ export default {
       this.errors[name] = this.$v[name].$error || false
     }
   },
-  created() {
+  created () {
     this.fields.forEach(field => {
       this.shouldValidate(field)
-      this.$options.computed[field.name] = function() {
+      this.$options.computed[field.name] = function () {
         let name = field.name
         if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
           name = 'required'
@@ -201,14 +201,6 @@ export default {
       handler(validations) {
         for(let field in validations) {
           this.errors[field] = validations[field].$error
-        }
-      }
-    },
-    value: {
-      deep: true,
-      handler(value) {
-        if (JSON.stringify(value) !== JSON.stringify(this.data)) {
-          this.$set(this, 'data', value)
         }
       }
     }
