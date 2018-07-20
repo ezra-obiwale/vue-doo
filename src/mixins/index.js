@@ -142,7 +142,7 @@ export default (Vue, options = {}) => {
         if (link === '#') {
           e.preventDefault()
         }
-        else if (link.indexOf('://') === -1) {
+        else if (typeof link == 'string' && link.indexOf('://') === -1) {
           this.$router.push(link)
         }
       },

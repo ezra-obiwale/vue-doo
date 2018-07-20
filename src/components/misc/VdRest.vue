@@ -81,7 +81,7 @@ export default {
         return this.storeData
       },
       set (data) {
-        if (Array.isArray(this.dummyData)) {
+        if (this.dummyData) {
           return this.dummyData = data
         }
         return this.setData(data)
@@ -126,11 +126,6 @@ export default {
     this.scopeTo(this.collection || Date.now())
 
     this.urlChanged()
-  },
-  beforeDestroy () {
-    if (this.$store) {
-      this.$store.unregisterModule('vd-rd')
-    }
   },
   methods: {
     ...mapMutations('vd-rd', {
@@ -243,9 +238,9 @@ export default {
     },
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination,
-        ignoreCache = config.ignoreCache || false
+        cacheOnly = config.cacheOnly !== false
 
-      if (this.data.length && !ignoreCache) {
+      if (this.data.length && !cacheOnly) {
         return this.$emit('loadManyOK', () => {}, this.data, true)
       }
 
@@ -253,8 +248,7 @@ export default {
         if (this.dummyData && !this.data.length) {
           this.loadData({
             data: this.dummyData,
-            pagination,
-            total: this.dummyData.length
+            pagination
           })
         }
         return this.$emit('loadManyOK', () => {}, this.data, true)
@@ -285,7 +279,6 @@ export default {
       }
 
       this.updateRowsPerPage(pagination.rowsPerPage)
-
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
@@ -347,6 +340,12 @@ export default {
       })
     },
     loadOne(id) {
+      if (this.data.length) {
+        let data = this.data.find(item => item.id == id)
+        if (data) {
+          this.setCurrentData(data)
+        }
+      }
       if (this.currentData.id == id) {
         return this.$emit('loadOneOK', () => {
           this.setCurrentData(this.currentData)
@@ -363,7 +362,7 @@ export default {
         handle: (proceed, cancel, resultUrl) => {
           let method = this.breadMethods['read'] || 'get'
           if (!resultUrl) {
-            resultUrl = fullUrl
+            resultUrl = url
           }
           if (this.lastUrl == resultUrl) {
             this.loading = false
@@ -411,11 +410,11 @@ export default {
         this.filter = filter
       }
       this.resetData()
-      this.loadMany()
+      this.loadMany({ cacheOnly: false })
     },
     performSearch() {
       this.resetData()
-      this.loadMany()
+      this.loadMany({ cacheOnly: false })
     },
     save(formData, htmlForm) {
       this.working = true
@@ -563,14 +562,14 @@ export default {
     },
     search (newSearch, oldSearch) {
       if (oldSearch && !newSearch) {
-        this.loadMany({ ignoreCache: true })
+        this.loadMany({ cacheOnly: false })
       }
     },
     totalRowsCount (count) {
       this.setRowsCount(count)
     },
     url () {
-      this.urlChanged({ ignoreCache: true })
+      this.urlChanged({ cacheOnly: false })
     }
   }
 }
