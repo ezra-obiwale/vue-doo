@@ -159,8 +159,8 @@ export default {
         else {
           validation = field.validation
         }
-        this.set(this.validations, field.name, validation)
-        this.set(this.errors, field.name, false)
+        this.set(field.name, this.validations, validation)
+        this.set(field.name, this.errors, false)
       }
     },
     show (field) {

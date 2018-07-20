@@ -47,28 +47,28 @@ export const RESET_CURRENT_DATA = state => {
 
 export const RESET_DATA = (state) => {
   let newScope = {}
-  Object.assign(newScope, state.pageDefault)
+  Object.assign(newScope, state.collectionDefault)
   newScope.id = scope(state).id
   newScope.searchQuery = scope(state).searchQuery
   newScope.filter = scope(state).filter
-  state.pages.splice(state.pageIndex, 1, newScope)
+  state.collections.splice(state.collectionIndex, 1, newScope)
   RESET_SCOPE(state)
 }
 
 const RESET_SCOPE = state => {
-  if (state.previousPageIndex > -1) {
-    state.pageIndex = state.previousPageIndex
+  if (state.previousCollectionIndex > -1) {
+    state.collectionIndex = state.previousCollectionIndex
   }
 }
 
 export const SCOPE_TO = (state, id) => {
-  state.pageIndex = state.pages.findIndex(page => page.id == id)
-  if (state.pageIndex == -1) {
-    let page = {}
-    Object.assign(page, state.pageDefault)
-    page.id = id
-    state.pages.push(page)
-    state.pageIndex = state.pages.length - 1
+  state.collectionIndex = state.collections.findIndex(collection => collection.id == id)
+  if (state.collectionIndex == -1) {
+    let collection = {}
+    Object.assign(collection, state.collectionDefault)
+    collection.id = id
+    state.collections.push(collection)
+    state.collectionIndex = state.collections.length - 1
   }
 }
 
@@ -100,7 +100,7 @@ export const SET_ROWS_NUMBER = (state, number) => {
 }
 
 export const TEMP_SCOPE_TO = (state, id) => {
-  state.previousPageIndex = state.pageIndex
+  state.previousCollectionIndex = state.collectionIndex
   SCOPE_TO(state, id)
 }
 

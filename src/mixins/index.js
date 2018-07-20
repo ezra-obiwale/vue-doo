@@ -1,10 +1,10 @@
-import Hello from 'hellojs'
+// import Hello from 'hellojs'
 import Http from '../http'
-import Swal from 'sweetalert'
-import Toasted from 'vue-toasted'
+// import Swal from 'sweetalert'
+// import Toasted from 'vue-toasted'
 import WSocket from '../wsocket'
 
-let VueSocialSharing = require('vue-social-sharing')
+// let VueSocialSharing = require('vue-social-sharing')
 let loadedScripts = {}
 
 export default (Vue, options = {}) => {
@@ -567,7 +567,7 @@ export default (Vue, options = {}) => {
           targets.obj.splice(targets.key, 1, value)
         }
         else if (targets.obj) {
-          this.$push(value, targets.obj, targets.key)
+          this.$push(targets.key, targets.obj, value)
         }
       },
       /**

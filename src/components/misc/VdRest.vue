@@ -125,10 +125,7 @@ export default {
   created () {
     this.scopeTo(this.collection || Date.now())
 
-    if (!this.data.length ||
-      (this.readOnlyId && !this.data.find(d => d.id == this.readOnlyId))) {
-      this.urlChanged()
-    }
+    this.urlChanged()
   },
   beforeDestroy () {
     if (this.$store) {
@@ -245,7 +242,13 @@ export default {
         : this.storeData.find(data => data.id === id)
     },
     loadMany(config = {}) {
-      let pagination = config.pagination || this.pagination
+      let pagination = config.pagination || this.pagination,
+        ignoreCache = config.ignoreCache || false
+
+      if (this.data.length && !ignoreCache) {
+        return this.$emit('loadManyOK', () => {}, this.data, true)
+      }
+
       if (!this.url) {
         if (this.dummyData && !this.data.length) {
           this.loadData({
@@ -527,11 +530,11 @@ export default {
     searchQueryChanged(query) {
       this.search = query
     },
-    urlChanged () {
+    urlChanged (config = {}) {
       if (this.readOnlyId) {
         this.loadOne(this.readOnlyId)
       } else {
-        this.loadMany()
+        this.loadMany(config)
       }
     },
     withSlash(url) {
@@ -542,7 +545,8 @@ export default {
     }
   },
   watch: {
-    collection () {
+    collection (collection) {
+      this.scopeTo(collection)
       this.urlChanged()
     },
     currentData: {
@@ -559,14 +563,14 @@ export default {
     },
     search (newSearch, oldSearch) {
       if (oldSearch && !newSearch) {
-        this.loadMany()
+        this.loadMany({ ignoreCache: true })
       }
     },
     totalRowsCount (count) {
       this.setRowsCount(count)
     },
     url () {
-      this.urlChanged()
+      this.urlChanged({ ignoreCache: true })
     }
   }
 }
