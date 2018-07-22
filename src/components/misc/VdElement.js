@@ -14,7 +14,7 @@ export default {
     return createElement(
       this.tag,
       {
-        attrs: this.keysExcept(['text', 'tag', 'class', 'style'], this.$attrs),
+        attrs: this.keysExcept(this.$attrs, ['text', 'tag', 'class', 'style']),
         class: this.classObject,
         style: this.styleObject,
         on: this.$listeners

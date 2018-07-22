@@ -20,11 +20,6 @@
             v-model="data[field.dataKey || field.name]"
             v-on="events(field)" />
         </slot>
-        <input
-          v-if="field.formFriendly"
-          :name="cleanName(field)"
-          type="hidden"
-          :value="cleanValue(field)" />
       </div>
     </template>
   </div>
@@ -63,21 +58,75 @@ export default {
   inheritAttrs: false,
   data() {
     return {
-      data: {},
-      errors: {},
-      validations: {}
+      data: {}
     }
   },
-  validations() {
-    return this.validations
+  computed: {
+    errors () {
+      let errors = {}
+      this.fields.forEach(field => {
+        errors[field.name] = field.validation ? this.$v.$error : false
+      })
+      return errors
+    }
   },
   components: {
     VdFormField: () => import("./VdFormField.vue")
   },
-  computed: {
-    validator () {
-      return this.$v
-    }
+  created () {
+    this.$options.validations = {}
+    this.fields.forEach(field => {
+      if (field.validation) {
+        let validation = field.validation
+        if (typeof field.validation == 'string') {
+          validation = {}
+          let rules = field.validation.split('|')
+          rules.forEach(rule => {
+            let parts = rule.split(':'),
+              name = parts[0]
+
+            if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
+              name = 'required'
+            }
+            else if (name.startsWith('sameAs')) {
+              let validator = name.replace('sameAs','')
+              validator = validator[0].toLowerCase() + validator.substr(1)
+            }
+
+            validation[name] = parts.length > 1
+              ? Validators[parts[0]].apply(null, parts[1].split(','))
+              : Validators[parts[0]]
+          })
+        }
+        // if (field.name.indexOf('.') != -1) {
+        //   let _validation = {},
+        //     focus = _validation,
+        //     paths = field.name.split('.'),
+        //     root = paths.shift()
+        //   paths.forEach(path => {
+        //     focus.path = {
+        //       $each: {}
+        //     }
+        //     focus = focus.path.$each
+        //   })
+        //   focus = validation
+        //   this.$options.validations[root] = _validation
+        // } else {
+        //   this.$options.validations[field.name] = validation
+        // }
+        this.set(this.$options.validations, field.name.replace('.', '.$each.'), validation)
+      }
+      // this.$options.computed[field.name] = function () {
+      //   let name = field.name
+      //   if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
+      //     name = 'required'
+      //   }
+      //   else if (name.startsWith('sameAs')) {
+      //     name = 'sameAs'
+      //   }
+      //   return this.$v[name]
+      // }
+    })
   },
   methods: {
     cleanName(field) {
@@ -85,15 +134,6 @@ export default {
         return field.name.replace('.', '[').replace(/\./g, '][') + ']'
       }
       return field.name
-    },
-    cleanValue (field) {
-      let value = this.data[field.dataKey || field.name]
-      if (value === true) {
-        value = 1
-      } else if (value === false) {
-        value = 0
-      }
-      return value
     },
     dFieldClass (field) {
       return field.element.class !== undefined ? field.element.class : this.fieldClass
@@ -103,13 +143,13 @@ export default {
         events = {
           blur: (value) => {
             this.touch(field.name)
-            if (typeof this.deepValue('element.events.blur', field) == 'function') {
+            if (typeof this.deepValue(field, 'element.events.blur') == 'function') {
               field.element.events.blur(value)
             }
           },
           change: (value) => {
             this.touch(field.name)
-            if (typeof this.deepValue('element.events.change', field) == 'function') {
+            if (typeof this.deepValue(field, 'element.events.change') == 'function') {
               field.element.events.change(...arguments)
             }
             this.data[field.name] = value
@@ -117,7 +157,7 @@ export default {
           },
           input: (value) => {
             this.touch(field.name)
-            if (typeof this.deepValue('element.events.input', field) == 'function') {
+            if (typeof this.deepValue(field, 'element.events.input') == 'function') {
               field.element.events.input(...arguments)
             }
             this.data[field.name] = value
@@ -134,7 +174,7 @@ export default {
       this.$v.$touch()
       return this.$v.$error
     },
-    shouldValidate(field, index) {
+    shouldValidate(field) {
       if (field.validation) {
         let validation = {}
         if (typeof field.validation == 'string') {
@@ -159,8 +199,8 @@ export default {
         else {
           validation = field.validation
         }
-        this.set(field.name, this.validations, validation)
-        this.set(field.name, this.errors, false)
+        this.set(this.validations, field.name, validation)
+        this.set(this.errors, field.name, false)
       }
     },
     show (field) {
@@ -178,31 +218,6 @@ export default {
       }
       this.$v[name].$touch()
       this.errors[name] = this.$v[name].$error || false
-    }
-  },
-  created () {
-    this.fields.forEach(field => {
-      this.shouldValidate(field)
-      this.$options.computed[field.name] = function () {
-        let name = field.name
-        if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
-          name = 'required'
-        }
-        else if (name.startsWith('sameAs')) {
-          name = 'sameAs'
-        }
-        return this.$v[name]
-      }
-    })
-  },
-  watch: {
-    validator: {
-      deep: true,
-      handler(validations) {
-        for(let field in validations) {
-          this.errors[field] = validations[field].$error
-        }
-      }
     }
   }
 }

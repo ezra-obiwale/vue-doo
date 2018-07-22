@@ -1,14 +1,14 @@
-// import Hello from 'hellojs'
+import Hello from 'hellojs'
 import Http from '../http'
-// import Swal from 'sweetalert'
-// import Toasted from 'vue-toasted'
+import Swal from 'sweetalert'
+import Toasted from 'vue-toasted'
 import WSocket from '../wsocket'
 
-// let VueSocialSharing = require('vue-social-sharing')
+let VueSocialSharing = require('vue-social-sharing')
 let loadedScripts = {}
 
 export default (Vue, options = {}) => {
-  const deepValue = (target, baseObject, def) => {
+  const deepValue = (baseObject, target, def) => {
     if (!target) return def
     let value = baseObject || {},
       parts = target.split('.')
@@ -178,11 +178,11 @@ export default (Vue, options = {}) => {
       },
       /**
        * Delete a key from an object
-       * @param {string} target The dot-notation path to the key to delete
        * @param {object} baseObject The object to delete from
+       * @param {string} target The dot-notation path to the key to delete
        * @returns {object}
        */
-      deepDelete (target, baseObject) {
+      deepDelete (baseObject, target) {
         let value = baseObject || {},
           parts = target.split('.'),
           last = parts.pop(parts.length - 1),
@@ -217,8 +217,8 @@ export default (Vue, options = {}) => {
       /**
        * Fetches the value of the target from the base object
        *
-       * @param {string} target Dot-notation path to value
        * @param {object} baseObject Object to get the value from
+       * @param {string} target Dot-notation path to value
        * @param {any} def The default value if real value is null or undefined
        * @return {any}
        */
@@ -307,11 +307,11 @@ export default (Vue, options = {}) => {
       },
       /**
        * Remove given keys from the given object
-       * @param {string|Array} keys The keys on the object to remove
        * @param {object} obj The target object
+       * @param {string|Array} keys The keys on the object to remove
        * @returns {object} The new object
        */
-      keysExcept (keys, obj) {
+      keysExcept (obj, keys) {
         if (!Array.isArray(keys)) {
           keys = [keys]
         }
@@ -398,11 +398,11 @@ export default (Vue, options = {}) => {
       },
       /**
        * Return only the given keys from the given object
-       * @param {string|Array} keys The needed keys on the object
        * @param {object} obj The target object
+       * @param {string|Array} keys The needed keys on the object
        * @returns {object} The new object
        */
-      onlyKeys (keys, obj) {
+      onlyKeys (obj, keys) {
         if (!Array.isArray(keys)) {
           keys = [keys]
         }
@@ -437,10 +437,11 @@ export default (Vue, options = {}) => {
       },
       /**
        * Pluck a key from all children of the given obj
-       * @param {string} key The key to pluck from the obj
        * @param {object} obj The object to pluck the key from
+       * @param {string} key The key to pluck from the obj
+       * @returns {array}
        */
-      pluck (key, obj) {
+      pluck (obj, key) {
         let keys = []
         Object.values(obj)
           .forEach(item => keys.push(item[key]))
@@ -448,11 +449,11 @@ export default (Vue, options = {}) => {
       },
       /**
        * Reactively removes deep values from objects and array
-       * @param {string} key The dot-noted path to the key to remove
        * @param {object|array} obj The object to pull from`
+       * @param {string} key The dot-noted path to the key to remove
        * @returns {any} The removed value
        */
-      pull (key, obj) {
+      pull (obj, key) {
         let targets = getTargets(obj, key)
         if (Array.isArray(targets.obj)) {
           return targets.obj.splice(targets.key, 1)[0]
@@ -463,11 +464,12 @@ export default (Vue, options = {}) => {
       },
       /**
        * Reactively removes a value from an object or array
-       * @param {any} valueOrFunc The value to remove or a function that receives each item and its key in obj. The function should return true if the value should be removed
        * @param {object|array} obj The object to remove from
+       * @param {any} valueOrFunc The value to remove or a function that receives each item and its key in obj. 
+       * The function should return true if the value should be removed
        * @returns {any} The removed value
        */
-      pullValue (valueOrFunc, obj) {
+      pullValue (obj, valueOrFunc) {
         let pos
         if (valueOrFunc === undefined || !obj) return
 
@@ -506,13 +508,13 @@ export default (Vue, options = {}) => {
       },
       /**
        * Reactively adds a value to an object or array
-       * @param {any} value The value
        * @param {object|array} obj The object to push to value to
        * @param {string} key The dot-noted path key path to hold the value
+       * @param {any} value The value
        * @param {boolean} ignoreDots Indicates that the key should be treated as one and not a path
        * @returns {object|array} The object or array given
        */
-      $push (key, obj, value, ignoreDots = false) {
+      $push (obj, key, value, ignoreDots = false) {
         let targets = getTargets(obj, key, ignoreDots)
         if (Array.isArray(targets.obj)) {
           if (targets.key === undefined) obj.push(value)
@@ -555,12 +557,12 @@ export default (Vue, options = {}) => {
       },
       /**
        * Reactively sets a key on an array or object
+       * @param {object|array} obj The object or array
        * @param {string} key The dot-noted path to the key to hold the value
        * @param {any} value The value to set on the object
-       * @param {object|array} obj The object or array
        * @returns {nothing}
        */
-      set (key, obj, value) {
+      set (obj, key, value) {
         if (key === undefined) return
         let targets = getTargets(obj, key)
         if (Array.isArray(targets.obj)) {
@@ -625,7 +627,7 @@ export default (Vue, options = {}) => {
   }
 
   if (options.features.hello) {
-    mixins.hello = Hello.init(deepValue('hello.credentials', options, {}), deepValue('hello.options', options, {}))
+    mixins.hello = Hello.init(deepValue(options, 'hello.credentials', {}), deepValue( options, 'hello.options',{}))
     mixins.onHello = callback => {
       Hello.on("auth.login", auth => {
         if (typeof callback === 'function') {
