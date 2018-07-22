@@ -270,10 +270,18 @@ export default (Vue, options = {}) => {
           return handle(proceed, cancel, null, ...params)
         }
 
+        let reset = () => {
+          handle = () => {}
+          proceed = () => {}
+          error = () => {}
+          cancel = () => {}
+        }
+
         this.$emit(event, (resultOrOptions, error) => {
           if (resultOrOptions === undefined) {
             // not handled
             handle(proceed, cancel, resultOrOptions, ...params)
+            reset()
           }
           else if (resultOrOptions) {
             // proceed
@@ -281,14 +289,17 @@ export default (Vue, options = {}) => {
               typeof resultOrOptions == 'boolean' ? params[0] : resultOrOptions,
               ...params
             )
+            reset()
           }
           else if (error) {
             // error
             error(error, ...params)
+            reset()
           }
           else {
             // cancel
             cancel(...params)
+            reset()
           }
         }, ...params)
       },

@@ -76,6 +76,13 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('vdrs', {
+      currentData: 'currentData',
+      pagination: 'pagination',
+      storeFilter: 'filter',
+      storeData: 'data',
+      searchQuery: 'searchQuery'
+    }),
     data: {
       get () {
         return this.storeData
@@ -107,28 +114,13 @@ export default {
       }
     }
   },
-  beforeCreate () {
-    if (this.$store) {
-      this.$store.registerModule('vd-rd', store)
-      this.$options.computed = {
-        ...mapGetters('vd-rd', {
-          currentData: 'currentData',
-          pagination: 'pagination',
-          storeFilter: 'filter',
-          storeData: 'data',
-          searchQuery: 'searchQuery'
-        }),
-      ...this.$options.computed
-      }
-    }
-  },
   created () {
     this.scopeTo(this.collection || Date.now())
 
     this.urlChanged()
   },
   methods: {
-    ...mapMutations('vd-rd', {
+    ...mapMutations('vdrs', {
       addData: 'ADD_DATA',
       changeSearchQuery: 'CHANGE_SEARCH_QUERY',
       loadData: 'LOAD_DATA',
@@ -242,9 +234,11 @@ export default {
     },
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination,
-        cacheOnly = config.cacheOnly !== false
+        useCache = config.useCache !== false
 
-      if (this.data.length && !cacheOnly) {
+
+      if (useCache && this.data.length && (pagination.page == 1 ||
+        (pagination.page - 1) * pagination.rowsPerPage < this.data.length)) {
         return this.$emit('loadManyOK', () => {}, this.data, true)
       }
 
@@ -422,11 +416,11 @@ export default {
         this.filter = filter
       }
       this.resetData()
-      this.loadMany({ cacheOnly: false })
+      this.loadMany({ useCache: false })
     },
     performSearch() {
       this.resetData()
-      this.loadMany({ cacheOnly: false })
+      this.loadMany({ useCache: false })
     },
     save(formData, htmlForm) {
       this.working = true
@@ -586,14 +580,14 @@ export default {
     },
     search (newSearch, oldSearch) {
       if (oldSearch && !newSearch) {
-        this.loadMany({ cacheOnly: false })
+        this.loadMany({ useCache: false })
       }
     },
     totalRowsCount (count) {
       this.setRowsCount(count)
     },
     url () {
-      this.urlChanged({ cacheOnly: false })
+      this.urlChanged({ useCache: false })
     }
   }
 }

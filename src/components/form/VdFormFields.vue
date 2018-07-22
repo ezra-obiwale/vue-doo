@@ -114,9 +114,6 @@ export default {
         }
         this.set(this.validations, this.validationPath(field.name), validation)
       }
-      this.$options.computed[field.name] = function () {
-        return this.deepValue(this.data, field.name)
-      }
     })
   },
   methods: {
