@@ -1,6 +1,5 @@
 import mixins from './src/mixins'
 import RestStore from './src/store/rest'
-import Vuelidate from 'vuelidate'
 
 export default {
 
@@ -38,8 +37,6 @@ export default {
       }
       this.components(Vue, options.components)
     }
-
-    Vue.use(Vuelidate)
   },
   components: function (Vue, components) {
     for (let dir in components) {

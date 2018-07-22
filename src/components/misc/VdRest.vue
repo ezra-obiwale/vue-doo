@@ -155,7 +155,7 @@ export default {
           this.emit({
             event: 'deleteOK',
             params: [resp, false],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -171,7 +171,7 @@ export default {
           this.emit({
             event: 'deleteError',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -183,7 +183,7 @@ export default {
           this.working = false
           this.$emit('deleteCanceled')
         },
-        handle: (proceed, cancel) => {
+        handle: (proceed, error) => {
           if (!this.url) {
             return proceed(row)
           }
@@ -202,7 +202,7 @@ export default {
           this.emit({
             event: 'deleteManyOK',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -210,14 +210,18 @@ export default {
             }
           })
         },
-        cancel: resp => {
+        cancel: () => {
+          this.working = false
+          this.$emit('deleteManyCanceled')
+        },
+        error: resp => {
           this.working = false
           this.emit({
             event: 'deleteManyError',
             params: [resp]
           })
         },
-        handle: (proceed, cancel) => {
+        handle: (proceed, error) => {
           if (!this.url) {
             this.removeManyByIds(ids)
             return this.$emit('deleteManyOK', () => {}, ids, true)
@@ -227,7 +231,7 @@ export default {
             ids: ids
           })
           .then(proceed)
-          .catch(cancel)
+          .catch(error)
         }
       })
     },
@@ -282,7 +286,7 @@ export default {
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
-        handle: (proceed, cancel, resultUrl) => {
+        handle: (proceed, error, resultUrl) => {
           let method = this.breadMethods['browse'] || 'get'
           if (!resultUrl) {
             resultUrl = fullUrl
@@ -294,14 +298,14 @@ export default {
           this.lastUrl = fullUrl
           this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
-            .catch(cancel)
+            .catch(error)
         },
         proceed: resp => {
           this.loading = false
           this.emit({
             event: 'loadManyOK',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -321,7 +325,11 @@ export default {
             }
           }
         },
-        cancel: resp => {
+        cancel: () => {
+          this.loading = false
+          this.$emit('loadManyCanceled')
+        },
+        error: resp => {
           this.loading = false
           if (resp === false) {
             return
@@ -329,7 +337,7 @@ export default {
           this.emit({
             event: 'loadManyError',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -359,7 +367,7 @@ export default {
       this.emit({
         event: 'loadOne',
         params: [id, url],
-        handle: (proceed, cancel, resultUrl) => {
+        handle: (proceed, error, resultUrl) => {
           let method = this.breadMethods['read'] || 'get'
           if (!resultUrl) {
             resultUrl = url
@@ -371,14 +379,14 @@ export default {
           this.lastUrl = resultUrl
           this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
-            .catch(cancel)
+            .catch(error)
         },
         proceed: resp => {
           this.loading = false
           this.emit({
             event: 'loadOneOK',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -387,7 +395,11 @@ export default {
             }
           })
         },
-        cancel: resp => {
+        cancel: () => {
+          this.loading = false
+          this.$emit('loadOneCanceled')
+        },
+        error: resp => {
           this.loading = false
           if (resp === false) {
             return
@@ -395,7 +407,7 @@ export default {
           this.emit({
             event: 'loadOneError',
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -423,7 +435,7 @@ export default {
           this.emit({
             event: 'addData',
             params: [formData, true],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: formData => {
@@ -440,11 +452,12 @@ export default {
                 }
               })
             },
-            cancel: formData => {
+            cancel: () => {
               this.working = false
-              if (resp === false) {
-                return
-              }
+              this.$emit('addDataCanceled')
+            },
+            error: formData => {
+              this.working = false
             }
           })
         }
@@ -452,7 +465,7 @@ export default {
           this.emit({
             event: 'editData',
             params: [formData, true],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: formData => {
@@ -461,6 +474,13 @@ export default {
                 event: 'editDataOK',
                 params: [formData, true]
               })
+            },
+            cancel: () => {
+              this.working = false
+              this.$emit('editDataCanceled')
+            },
+            error: formData => {
+              this.working = false
             }
           })
         }
@@ -477,7 +497,7 @@ export default {
       this.emit({
         event: `${action}Data`,
         params: [formData, htmlForm],
-        handle: (proceed, cancel, result) => {
+        handle: (proceed, error, result) => {
           let _action = this.breadMethods[action].toLowerCase()
           let data = _action == 'put' || !htmlForm
             ? (result || formData)
@@ -485,13 +505,13 @@ export default {
           this.$http[_action]
             (url, data)
             .then(proceed)
-            .catch(cancel)
+            .catch(error)
         },
         proceed: resp => {
           this.emit({
             event: `${action}DataOK`,
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {
@@ -506,7 +526,11 @@ export default {
             }
           })
         },
-        cancel: resp => {
+        cancel: () => {
+          this.working = false
+          this.$emit(`${action}DataCanceled`)
+        },
+        error: resp => {
           if (resp === false) {
             this.working = false
             return
@@ -514,7 +538,7 @@ export default {
           this.emit({
             event: `${action}DataError`,
             params: [resp],
-            handle: (proceed, cancel, result) => {
+            handle: (proceed, error, result) => {
               proceed(result || resp)
             },
             proceed: resp => {

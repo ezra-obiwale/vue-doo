@@ -25,7 +25,7 @@
   </div>
 </template>
 <script>
-
+import { validationMixin } from 'vuelidate'
 import * as Validators from 'vuelidate/lib/validators'
 import { mapGetters, mapMutations } from 'vuex'
 
@@ -55,26 +55,40 @@ export default {
       }
     }
   },
+  mixins: [validationMixin],
   inheritAttrs: false,
   data() {
     return {
-      data: {}
+      validations: {}
     }
   },
   computed: {
+    data: {
+      get () {
+        return this.value
+      },
+      set (value) {
+        this.$emit('input', value)
+        this.$emit('change', value)
+      }
+    },
     errors () {
       let errors = {}
       this.fields.forEach(field => {
-        errors[field.name] = field.validation ? this.$v.$error : false
+        errors[field.name] = field.validation
+          ? this.deepValue(this.$v, this.validationPath(field.name), {$error: false}).$error
+          : false
       })
       return errors
     }
+  },
+  validations () {
+    return this.validations
   },
   components: {
     VdFormField: () => import("./VdFormField.vue")
   },
   created () {
-    this.$options.validations = {}
     this.fields.forEach(field => {
       if (field.validation) {
         let validation = field.validation
@@ -88,9 +102,9 @@ export default {
             if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
               name = 'required'
             }
-            else if (name.startsWith('sameAs')) {
-              let validator = name.replace('sameAs','')
-              validator = validator[0].toLowerCase() + validator.substr(1)
+
+            if (!Validators[parts[0]]) {
+              return
             }
 
             validation[name] = parts.length > 1
@@ -98,34 +112,11 @@ export default {
               : Validators[parts[0]]
           })
         }
-        // if (field.name.indexOf('.') != -1) {
-        //   let _validation = {},
-        //     focus = _validation,
-        //     paths = field.name.split('.'),
-        //     root = paths.shift()
-        //   paths.forEach(path => {
-        //     focus.path = {
-        //       $each: {}
-        //     }
-        //     focus = focus.path.$each
-        //   })
-        //   focus = validation
-        //   this.$options.validations[root] = _validation
-        // } else {
-        //   this.$options.validations[field.name] = validation
-        // }
-        this.set(this.$options.validations, field.name.replace('.', '.$each.'), validation)
+        this.set(this.validations, this.validationPath(field.name), validation)
       }
-      // this.$options.computed[field.name] = function () {
-      //   let name = field.name
-      //   if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
-      //     name = 'required'
-      //   }
-      //   else if (name.startsWith('sameAs')) {
-      //     name = 'sameAs'
-      //   }
-      //   return this.$v[name]
-      // }
+      this.$options.computed[field.name] = function () {
+        return this.deepValue(this.data, field.name)
+      }
     })
   },
   methods: {
@@ -153,7 +144,6 @@ export default {
               field.element.events.change(...arguments)
             }
             this.data[field.name] = value
-            this.$emit('change', this.data)
           },
           input: (value) => {
             this.touch(field.name)
@@ -161,7 +151,6 @@ export default {
               field.element.events.input(...arguments)
             }
             this.data[field.name] = value
-            this.$emit('input', this.data)
           }
         }
 
@@ -174,35 +163,6 @@ export default {
       this.$v.$touch()
       return this.$v.$error
     },
-    shouldValidate(field) {
-      if (field.validation) {
-        let validation = {}
-        if (typeof field.validation == 'string') {
-          let rules = field.validation.split('|')
-          rules.forEach(rule => {
-            let parts = rule.split(':'),
-              name = parts[0]
-
-            if (['requiredIf', 'requiredUnless'].indexOf(name) !== -1) {
-              name = 'required'
-            }
-            else if (name.startsWith('sameAs')) {
-              validator = name.replace('sameAs','')
-              validator = validator[0].toLowerCase() + validator.substr(1)
-            }
-
-            validation[parts[0]] = parts.length > 1
-              ? Validators[parts[0]](...parts[1].split(','))
-              : Validators[parts[0]]
-          })
-        }
-        else {
-          validation = field.validation
-        }
-        this.set(this.validations, field.name, validation)
-        this.set(this.errors, field.name, false)
-      }
-    },
     show (field) {
       if ('show' in field) {
         if (typeof field.show == 'function') {
@@ -213,11 +173,14 @@ export default {
       return true
     },
     touch(name) {
-      if (!this.$v[name]) {
+      let _name = this.validationPath(name)
+      if (!this.$v[_name]) {
         return
       }
-      this.$v[name].$touch()
-      this.errors[name] = this.$v[name].$error || false
+      this.$v[_name].$touch()
+    },
+    validationPath (name) {
+      return name.replace(/\./g, '.$each.')
     }
   }
 }

@@ -256,13 +256,14 @@ export default (Vue, options = {}) => {
        * `proceed` (function), `cancel` (function) and `handle` function
        * @returns {nothing}
        */
-      emit ({ event, params, proceed, cancel, handle }) {
+      emit ({ event, params, error, proceed, cancel, handle }) {
         if (!event) {
           return
         }
         params = params || []
         proceed = proceed || (() => {})
         cancel = cancel || (() => {})
+        error = error || (() => {})
         handle = handle || (() => {})
 
         if (!this.$listeners[event]) {
@@ -281,9 +282,13 @@ export default (Vue, options = {}) => {
               ...params
             )
           }
+          else if (error) {
+            // error
+            error(error, ...params)
+          }
           else {
             // cancel
-            cancel(error, ...params)
+            cancel(...params)
           }
         }, ...params)
       },
@@ -465,7 +470,7 @@ export default (Vue, options = {}) => {
       /**
        * Reactively removes a value from an object or array
        * @param {object|array} obj The object to remove from
-       * @param {any} valueOrFunc The value to remove or a function that receives each item and its key in obj. 
+       * @param {any} valueOrFunc The value to remove or a function that receives each item and its key in obj.
        * The function should return true if the value should be removed
        * @returns {any} The removed value
        */
@@ -504,7 +509,7 @@ export default (Vue, options = {}) => {
           }
         }
 
-        if (obj) return this.pull(pos, obj)
+        if (obj) return this.pull(obj, pos)
       },
       /**
        * Reactively adds a value to an object or array
@@ -569,7 +574,7 @@ export default (Vue, options = {}) => {
           targets.obj.splice(targets.key, 1, value)
         }
         else if (targets.obj) {
-          this.$push(targets.key, targets.obj, value)
+          this.$push(targets.obj, targets.key, value)
         }
       },
       /**
@@ -627,7 +632,7 @@ export default (Vue, options = {}) => {
   }
 
   if (options.features.hello) {
-    mixins.hello = Hello.init(deepValue(options, 'hello.credentials', {}), deepValue( options, 'hello.options',{}))
+    mixins.hello = Hello.init(deepValue(options, 'hello.credentials', {}), deepValue(options, 'hello.options', {}))
     mixins.onHello = callback => {
       Hello.on("auth.login", auth => {
         if (typeof callback === 'function') {
