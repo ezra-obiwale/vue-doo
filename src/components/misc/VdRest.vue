@@ -66,6 +66,12 @@ export default {
     },
     url: {
       type: String
+    },
+    watch: {
+      type: Array,
+      default: function () {
+        return []
+      }
     }
   },
   data () {
@@ -115,6 +121,11 @@ export default {
     }
   },
   created () {
+    this.watch.forEach(watch => {
+      this.$watch(watch, function () {
+        this.$emit(`${watch}Changed`, ...arguments)
+      })
+    })
     this.scopeTo(this.collection || Date.now())
 
     this.urlChanged()
@@ -236,12 +247,6 @@ export default {
       let pagination = config.pagination || this.pagination,
         useCache = config.useCache !== false
 
-
-      if (useCache && this.data.length && (pagination.page == 1 ||
-        (pagination.page - 1) * pagination.rowsPerPage < this.data.length)) {
-        return this.$emit('loadManyOK', () => {}, this.data, true)
-      }
-
       if (!this.url) {
         if (this.dummyData && !this.data.length) {
           this.loadData({
@@ -277,6 +282,14 @@ export default {
       }
 
       this.updateRowsPerPage(pagination.rowsPerPage)
+
+      if ((this.lastUrl && this.lastUrl == fullUrl || !this.lastUrl) &&
+          (useCache && this.data.length && (pagination.page == 1 ||
+          (pagination.page - 1) * pagination.rowsPerPage < this.data.length))) {
+          this.loading = false
+        return this.$emit('loadManyOK', () => {}, this.data, true)
+      }
+
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
@@ -511,7 +524,6 @@ export default {
             proceed: resp => {
               if (action === 'add') {
                 this.addData(resp.data)
-                this.$set(this, 'formData', {})
               }
               else {
                 this.updateData(resp.data)
