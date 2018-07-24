@@ -258,7 +258,9 @@ export default {
       }
       this.loading = true
 
-      let fullUrl = `${this.url}?page=${pagination.page}`
+      let fullUrl = `${this.url}`
+      fullUrl += fullUrl.indexOf('?') !== -1 ? '&' : '?'
+      fullUrl += `page=${pagination.page}`
       if (this.search) {
         fullUrl += `&query=${this.search}`
       }
@@ -599,6 +601,7 @@ export default {
       this.setRowsCount(count)
     },
     url () {
+      this.resetData()
       this.urlChanged({ useCache: false })
     }
   }

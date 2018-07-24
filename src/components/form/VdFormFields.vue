@@ -6,7 +6,7 @@
         :class="field.columnClass || columnClass"
         v-if="show(field)">
         <slot name="field"
-          :data.sync="data[field.name]"
+          :data.sync="data[field.dataKey || field.name]"
           :error="errors[field.name]"
           :events="events(field)"
           :field="field" >
@@ -59,6 +59,7 @@ export default {
   inheritAttrs: false,
   data() {
     return {
+      dataKeys: {},
       validations: {}
     }
   },
@@ -68,6 +69,9 @@ export default {
         return this.value
       },
       set (value) {
+        for (let key in this.dataKeys) {
+          value[this.dataKeys[key]] = value[key]
+        }
         this.$emit('input', value)
         this.$emit('change', value)
       }
@@ -161,6 +165,9 @@ export default {
       return this.$v.$error
     },
     show (field) {
+      if (field.dataKey) {
+        this.$set(this.dataKeys, field.dataKey, field.name)
+      }
       if ('show' in field) {
         if (typeof field.show == 'function') {
           return field.show(this.value)
