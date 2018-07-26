@@ -45,6 +45,10 @@ export default {
       type: [Array, Boolean],
       default: false
     },
+    forceOnline: {
+      type: Boolean,
+      default: false
+    },
     readOnlyId: {
       type: [Number, String],
       default: 0
@@ -78,6 +82,7 @@ export default {
     return {
       lastUrl: null,
       loading: false,
+      isOnline: window.navigator.onLine,
       working: false
     }
   },
@@ -120,6 +125,36 @@ export default {
       }
     }
   },
+  watch: {
+    collection (collection) {
+      this.scopeTo(collection)
+      this.urlChanged()
+    },
+    currentData: {
+      deep: true,
+      handler(data) {
+        this.$emit('currentDataUpdated', data)
+      }
+    },
+    currentPage (page) {
+      this.setCurrentDataPage(page)
+    },
+    readOnlyId (id) {
+      this.urlChanged()
+    },
+    search (newSearch, oldSearch) {
+      if (oldSearch && !newSearch) {
+        this.loadMany({ useCache: false })
+      }
+    },
+    totalRowsCount (count) {
+      this.setRowsCount(count)
+    },
+    url () {
+      this.resetData()
+      this.urlChanged({ useCache: false })
+    }
+  },
   created () {
     this.watch.forEach(watch => {
       this.$watch(watch, function () {
@@ -127,8 +162,24 @@ export default {
       })
     })
     this.scopeTo(this.collection || Date.now())
+    if (!this.isOnline) {
+      this.isOnline = this.forceOnline
+    }
 
     this.urlChanged()
+
+    if ('ononline' in window) {
+      window.ononline = () => {
+        this.isOnline = true
+        this.$emit('online')
+      }
+    }
+    if ('onoffline' in window) {
+      window.onoffline = () => {
+        this.isOnline = false
+        this.$emit('offline')
+      }
+    }
   },
   methods: {
     ...mapMutations('vdrs', {
@@ -176,9 +227,6 @@ export default {
             params: [resp],
             handle: (proceed, error, result) => {
               proceed(result || resp)
-            },
-            proceed: resp => {
-              this.processErrors(resp)
             }
           })
         },
@@ -190,10 +238,13 @@ export default {
           if (!this.url) {
             return proceed(row)
           }
+          if (!this.isOnline) {
+            return this.$emit('offline', 'delete', id, index)
+          }
           let method = this.breadMethods['delete'] || 'delete'
           this.$http[method.toLowerCase()](this.withSlash() + id)
-          .then(proceed)
-          .catch(error)
+            .then(proceed)
+            .catch(error)
         }
       })
     },
@@ -228,6 +279,9 @@ export default {
           if (!this.url) {
             this.removeManyByIds(ids)
             return this.$emit('deleteManyOK', () => {}, ids, true)
+          }
+          if (!this.isOnline) {
+            return this.$emit('offline', 'deleteMany', ids)
           }
           let method = this.breadMethods['deleteMany'] || 'post'
           this.$http[method.toLowerCase()](this.withSlash() + 'delete-many', {
@@ -304,6 +358,9 @@ export default {
             this.loading = false
             return
           }
+          if (!this.isOnline) {
+            return this.$emit('offline', 'loadMany', config)
+          }
           this.lastUrl = fullUrl
           this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
@@ -348,9 +405,6 @@ export default {
             params: [resp],
             handle: (proceed, error, result) => {
               proceed(result || resp)
-            },
-            proceed: resp => {
-              this.processErrors(resp)
             }
           })
         }
@@ -385,6 +439,9 @@ export default {
             this.loading = false
             return
           }
+          if (!this.isOnline) {
+            return this.$emit('offline', 'loadOne', id)
+          }
           this.lastUrl = resultUrl
           this.$http[method.toLowerCase()](resultUrl)
             .then(proceed)
@@ -418,9 +475,6 @@ export default {
             params: [resp],
             handle: (proceed, error, result) => {
               proceed(result || resp)
-            },
-            proceed: resp => {
-              this.processErrors(resp)
             }
           })
         }
@@ -507,6 +561,9 @@ export default {
         event: `${action}Data`,
         params: [formData, htmlForm],
         handle: (proceed, error, result) => {
+          if (!this.isOnline) {
+            return this.$emit('offline', 'save', formData, htmlForm)
+          }
           let _action = this.breadMethods[action].toLowerCase()
           let data = _action == 'put' || !htmlForm
             ? (result || formData)
@@ -552,7 +609,6 @@ export default {
             proceed: resp => {
               this.working = false
               this.$emit(`${action}DataError`, resp)
-              this.processErrors(resp)
             }
           })
         }
@@ -573,36 +629,6 @@ export default {
         url = this.url
       }
       return url.endsWith('/') ? url : `${url}/`
-    }
-  },
-  watch: {
-    collection (collection) {
-      this.scopeTo(collection)
-      this.urlChanged()
-    },
-    currentData: {
-      deep: true,
-      handler(data) {
-        this.$emit('currentDataUpdated', data)
-      }
-    },
-    currentPage (page) {
-      this.setCurrentDataPage(page)
-    },
-    readOnlyId (id) {
-      this.urlChanged()
-    },
-    search (newSearch, oldSearch) {
-      if (oldSearch && !newSearch) {
-        this.loadMany({ useCache: false })
-      }
-    },
-    totalRowsCount (count) {
-      this.setRowsCount(count)
-    },
-    url () {
-      this.resetData()
-      this.urlChanged({ useCache: false })
     }
   }
 }

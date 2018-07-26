@@ -117,6 +117,16 @@ export default (Vue, options = {}) => {
         return typeof func == 'function' ? func : (defFunc || (() => {}))
       },
       /**
+       * Capitalize a string
+       * @param {string} str The string
+       * @returns {string}
+       */
+      capitalize (str) {
+        return (' ' + str)
+          .replace(/\s[a-z]/g, letter => letter.toUpperCase())
+          .substr(1)
+      },
+      /**
        * Fetches the css classes on the current component as an object
        * @returns {object}
        */
