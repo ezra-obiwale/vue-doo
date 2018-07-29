@@ -1,4 +1,4 @@
-import { scope } from './helpers'
+import { scope, newScope as NewScope } from './helpers'
 import Vue from 'vue'
 
 export const ADD_DATA = (state, data) => {
@@ -46,8 +46,7 @@ export const RESET_CURRENT_DATA = state => {
 }
 
 export const RESET_DATA = (state) => {
-  let newScope = {}
-  Object.assign(newScope, state.collectionDefault)
+  let newScope = NewScope(state)
   newScope.id = scope(state).id
   newScope.searchQuery = scope(state).searchQuery
   newScope.filter = scope(state).filter
@@ -64,8 +63,7 @@ const RESET_SCOPE = state => {
 export const SCOPE_TO = (state, id) => {
   state.collectionIndex = state.collections.findIndex(collection => collection.id == id)
   if (state.collectionIndex == -1) {
-    let collection = {}
-    Object.assign(collection, state.collectionDefault)
+    let collection = NewScope(state)
     collection.id = id
     state.collections.push(collection)
     state.collectionIndex = state.collections.length - 1

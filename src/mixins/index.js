@@ -123,6 +123,7 @@ export default (Vue, options = {}) => {
        */
       capitalize (str) {
         return (' ' + str)
+          .toLowerCase()
           .replace(/\s[a-z]/g, letter => letter.toUpperCase())
           .substr(1)
       },
@@ -277,7 +278,7 @@ export default (Vue, options = {}) => {
         handle = handle || (() => {})
 
         if (!this.$listeners[event]) {
-          return handle(proceed, cancel, null, ...params)
+          return handle(proceed, error, null, ...params)
         }
 
         let reset = () => {
@@ -290,7 +291,7 @@ export default (Vue, options = {}) => {
         this.$emit(event, (resultOrOptions, error) => {
           if (resultOrOptions === undefined) {
             // not handled
-            handle(proceed, cancel, resultOrOptions, ...params)
+            handle(proceed, error, resultOrOptions, ...params)
             reset()
           }
           else if (resultOrOptions) {

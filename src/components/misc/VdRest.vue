@@ -72,9 +72,9 @@ export default {
       type: String
     },
     watch: {
-      type: Array,
+      type: Object,
       default: function () {
-        return []
+        return {}
       }
     }
   },
@@ -148,7 +148,9 @@ export default {
       }
     },
     totalRowsCount (count) {
-      this.setRowsCount(count)
+      if (typeof count == 'number') {
+        this.setRowsCount(count)
+      }
     },
     url () {
       this.resetData()
@@ -156,11 +158,11 @@ export default {
     }
   },
   created () {
-    this.watch.forEach(watch => {
+    for (let watch in this.watch) {
       this.$watch(watch, function () {
-        this.$emit(`${watch}Changed`, ...arguments)
+        this.watch[watch](...arguments)
       })
-    })
+    }
     this.scopeTo(this.collection || Date.now())
     if (!this.isOnline) {
       this.isOnline = this.forceOnline
@@ -300,7 +302,6 @@ export default {
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination,
         useCache = config.useCache !== false
-
       if (!this.url) {
         if (this.dummyData && !this.data.length) {
           this.loadData({
@@ -341,8 +342,9 @@ export default {
 
       if ((this.lastUrl && this.lastUrl == fullUrl || !this.lastUrl) &&
           (useCache && this.data.length && (pagination.page == 1 ||
-          (pagination.page - 1) * pagination.rowsPerPage < this.data.length))) {
-          this.loading = false
+          (pagination.page - 1) * pagination.rowsPerPage < this.data.length) &&
+          pagination.rowsNumber >= this.data.length)) {
+        this.loading = false
         return this.$emit('loadManyOK', () => {}, this.data, true)
       }
 
@@ -382,6 +384,9 @@ export default {
                 data: resp.data,
                 pagination
               })
+              if (typeof config.done == 'function') {
+                config.done(resp)
+              }
             }
           })
           if (typeof this.totalRowsCount == 'function') {
@@ -608,7 +613,6 @@ export default {
             },
             proceed: resp => {
               this.working = false
-              this.$emit(`${action}DataError`, resp)
             }
           })
         }
