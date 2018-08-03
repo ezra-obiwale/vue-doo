@@ -469,9 +469,11 @@ export default (Vue, options = {}) => {
        * @returns {array}
        */
       pluck (obj, key) {
-        let keys = []
-        Object.values(obj)
-          .forEach(item => keys.push(item[key]))
+        let keys = [],
+          values = Object.values(obj)
+        if (values.length) {
+          values.forEach(item => keys.push(item[key]))
+        }
         return keys
       },
       /**
