@@ -9,9 +9,9 @@
     "hellojs": "^2.0.0-4",
     "sweetalert": "^2.1.0",
     "vue": "^2.5.13",
-    "vuelidate": "^0.6.2",
     "vue-social-sharing": "^2.3.3",
     "vue-toasted": "^1.1.24",
+    "vuelidate": "^0.6.2",
     "vuex": "^3.0.1"
   },
   "bundleDependencies": [],
@@ -27,5 +27,5 @@
     "install": "node install.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "3.1.0"
+  "version": "4.0.0"
 }
