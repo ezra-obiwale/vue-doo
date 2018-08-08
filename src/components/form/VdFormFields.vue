@@ -3,10 +3,11 @@
     <template v-for="(field, index) in fields">
       <div
         :key="index"
+        :ref="`col_${field.name}`"
         :class="field.columnClass || columnClass"
         v-if="show(field)">
         <slot name="field"
-          :data.sync="data[field.dataKey || field.name]"
+          :data.sync="data"
           :error="errors[field.name]"
           :events="events(field)"
           :field="field" >
@@ -170,7 +171,7 @@ export default {
       }
       if ('show' in field) {
         if (typeof field.show == 'function') {
-          return field.show(this.value)
+          return !(!field.show(this.value))
         }
         return field.show
       }
