@@ -23,16 +23,16 @@
     </option>
     <template v-else
       v-for="option in stateOptions">
-      <option v-if="option.id == value"
+      <option v-if="option.value == value"
         selected="selected"
-        :value="option.id"
-        :key="option.id">
-        {{ option.name }}
+        :value="option.value"
+        :key="option.value">
+        {{ option.label }}
       </option>
       <option v-else
-        :value="option.id"
-        :key="option.id">
-        {{ option.name }}
+        :value="option.value"
+        :key="option.value">
+        {{ option.label }}
       </option>
     </template>
   </select>
