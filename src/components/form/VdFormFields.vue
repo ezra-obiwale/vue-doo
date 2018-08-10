@@ -18,7 +18,7 @@
             :error="errors[field.name]"
             :class="dFieldClass(field)"
             v-bind="field.element.attributes || {}"
-            v-model="data[field.dataKey || field.name]"
+            :value="deepValue(data, field.dataKey || field.name)"
             v-on="events(field)" />
         </slot>
       </div>
@@ -145,14 +145,14 @@ export default {
             if (typeof this.deepValue(field, 'element.events.change') == 'function') {
               field.element.events.change(...arguments)
             }
-            this.data[field.name] = value
+            this.set(this.data, field.name, value)
           },
           input: (value) => {
             this.touch(field.name)
             if (typeof this.deepValue(field, 'element.events.input') == 'function') {
               field.element.events.input(...arguments)
             }
-            this.data[field.name] = value
+            this.set(this.data, field.name, value)
           }
         }
 
