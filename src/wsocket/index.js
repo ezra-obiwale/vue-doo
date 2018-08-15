@@ -5,9 +5,12 @@ export default class WSocket {
     if (url) {
       this.connect(url)
     }
-
+    this.queued = false
     try {
-      this.queue = JSON.parse(localStorage.getItem('wsocketqueue'))
+      this.queue = JSON.parse(localStorage.getItem('wsq'))
+      if (!this.queue) {
+        this.queue = []
+      }
     } catch (e) {
       this.queue = []
     }
@@ -21,7 +24,10 @@ export default class WSocket {
   connect (url) {
     this.url = url
     this.ws = new WebSocket(url)
-    this.ws.onopen = () => this._resolve('connect', ...arguments)
+    this.ws.onopen = () => {
+      this._connected(...arguments)
+      this._resolve('connect', ...arguments)
+    }
     this.ws.onerror = () => this._resolve('error', ...arguments)
     this.ws.onclose = () => {
       this.connect(url)
@@ -48,14 +54,6 @@ export default class WSocket {
     return this
   }
 
-  _resolve (event, data) {
-    if (this._callbacks[event]) {
-      this._callbacks[event].forEach(callback => callback(data))
-    }
-
-    return this
-  }
-
   /**
    * Emit an event
    * @param {string} event The event to emit
@@ -67,8 +65,15 @@ export default class WSocket {
       event,
       data
     })
-    this.queue.push(message)
-    // this.ws.send(message)
+    if (this.ws.readyState == 1) {
+      this.ws.send(message)
+      this.queued = false
+    } else {
+      this.queue.push(message)
+      this._saveQueue()
+      this.queued = true
+    }
+
     return this
   }
 
@@ -106,6 +111,30 @@ export default class WSocket {
       })
     }
     return this
+  }
+
+  _connected () {
+    this._resolveQueue()
+  }
+
+  _resolve (event, data) {
+    if (this._callbacks[event]) {
+      this._callbacks[event].forEach(callback => callback(data))
+    }
+
+    return this
+  }
+
+  _resolveQueue () {
+    let message = this.queue.shift()
+    while (this.readyState == 1 && message) {
+      this.ws.send(message)
+    }
+    this._saveQueue()
+  }
+
+  _saveQueue () {
+    localStorage.setItem('wsq', JSON.stringify(this.queue))
   }
 
 }
