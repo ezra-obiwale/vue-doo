@@ -202,6 +202,10 @@ export default {
       updateRowsPerPage: 'UPDATE_ROWS_PER_PAGE'
     }),
     delete (id, index) {
+      if (this.working) {
+        return
+      }
+      this.working = true
       let row = this.getData(id, index)
       this.emit({
         event: 'delete',
@@ -238,9 +242,11 @@ export default {
         },
         handle: (proceed, error) => {
           if (!this.url) {
+            this.working = false
             return proceed(row)
           }
           if (!this.isOnline) {
+            this.working = false
             return this.$emit('offline', 'delete', id, index)
           }
           let method = this.breadMethods['delete'] || 'delete'
@@ -251,10 +257,15 @@ export default {
       })
     },
     deleteMany(ids) {
+      if (this.working) {
+        return
+      }
+      this.working = true
       this.emit({
         event: 'deleteMany',
         params: [ids],
         proceed: resp => {
+          this.working = false
           this.emit({
             event: 'deleteManyOK',
             params: [resp],
@@ -280,9 +291,11 @@ export default {
         handle: (proceed, error) => {
           if (!this.url) {
             this.removeManyByIds(ids)
+            this.working = false
             return this.$emit('deleteManyOK', () => {}, ids, true)
           }
           if (!this.isOnline) {
+            this.working = false
             return this.$emit('offline', 'deleteMany', ids)
           }
           let method = this.breadMethods['deleteMany'] || 'post'
@@ -497,6 +510,9 @@ export default {
       this.loadMany({ useCache: false })
     },
     save(formData, htmlForm) {
+      if (this.working) {
+        return
+      }
       this.working = true
       if (!this.url) {
         if (!formData.id) {
