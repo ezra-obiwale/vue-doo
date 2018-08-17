@@ -288,10 +288,10 @@ export default (Vue, options = {}) => {
           cancel = () => {}
         }
 
-        this.$emit(event, (resultOrOptions, error) => {
+        this.$emit(event, (resultOrOptions, err) => {
           if (resultOrOptions === undefined) {
             // not handled
-            handle(proceed, error, resultOrOptions, ...params)
+            handle(proceed, err, resultOrOptions, ...params)
             reset()
           }
           else if (resultOrOptions) {
@@ -302,9 +302,9 @@ export default (Vue, options = {}) => {
             )
             reset()
           }
-          else if (error) {
+          else if (err) {
             // error
-            error(error, ...params)
+            error(err, ...params)
             reset()
           }
           else {
