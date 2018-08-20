@@ -66,7 +66,7 @@ export default {
     return {
       error: false,
       loading: true,
-      countries: {}
+      countries: []
     }
   },
   computed: {
@@ -115,7 +115,7 @@ export default {
       $.get('//restcountries.eu/rest/v2/all')
         .done(resp => {
           this.loading = false
-          this.$set(this, 'countries', resp.data)
+          this.$set(this, 'countries', resp)
         })
         .error(resp => {
           this.error = true
