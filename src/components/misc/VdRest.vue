@@ -139,6 +139,9 @@ export default {
     currentPage (page) {
       this.setCurrentDataPage(page)
     },
+    filter () {
+      this.urlChanged()
+    },
     readOnlyId (id) {
       this.urlChanged()
     },
