@@ -28,7 +28,6 @@
 <script>
 import { validationMixin } from 'vuelidate'
 import * as Validators from 'vuelidate/lib/validators'
-import { mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: "VdFormFields",
@@ -71,7 +70,7 @@ export default {
       },
       set (value) {
         for (let key in this.dataKeys) {
-          value[this.dataKeys[key]] = value[key]
+          value[this.dataKeys[key]] = this.deepValue(value, key)
         }
         this.$emit('input', value)
         this.$emit('change', value)
