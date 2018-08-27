@@ -3,7 +3,7 @@
     :is="name"
     :id="id"
     :name="cleanName(id)"
-    :value="value"
+    :value="theValue"
     v-bind="$attrs"
     v-on="$listeners" />
 </template>
@@ -40,9 +40,14 @@ export default {
     }
   },
   mounted () {
-    if (!this.value && this.defaultValue !== '') {
+    if (!this.value && this.value !== 0 && this.defaultValue !== '') {
       this.$emit('change', this.defaultValue)
       this.$emit('input', this.defaultValue)
+    }
+  },
+  computed: {
+    theValue () {
+      return !this.value && this.value !== 0 ? this.defaultValue : this.value
     }
   },
   watch: {
@@ -50,6 +55,7 @@ export default {
       if (!value && value !== 0 && value !== this.defaultValue) {
         this.$emit('change', this.defaultValue)
         this.$emit('input', this.defaultValue)
+      } else {
       }
     }
   }
