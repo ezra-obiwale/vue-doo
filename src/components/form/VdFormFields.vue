@@ -18,7 +18,7 @@
             :error="errors[field.name]"
             :class="dFieldClass(field)"
             v-bind="field.element.attributes || {}"
-            :value="deepValue(data, field.dataKey || field.name)"
+            :value="deepValue(data, field.name, deepValue(data, field.dataKey))"
             v-on="events(field)" />
         </slot>
       </div>
