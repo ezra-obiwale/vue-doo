@@ -122,10 +122,12 @@ export default (Vue, options = {}) => {
        * @returns {string}
        */
       capitalize (str) {
-        return (' ' + str)
-          .toLowerCase()
-          .replace(/\s[a-z]/g, letter => letter.toUpperCase())
-          .substr(1)
+        return typeof str == 'str' && str
+          ? (' ' + str)
+            .toLowerCase()
+            .replace(/\s[a-z]/g, letter => letter.toUpperCase())
+            .substr(1)
+          : str
       },
       /**
        * Fetches the css classes on the current component as an object
