@@ -113,6 +113,10 @@ export const UPDATE_CURRENT_DATA = (state, data) => {
   RESET_SCOPE(state)
 }
 
+export const UPDATE_PAGINATION = (state, pagination) => {
+  scope(state).pagination = pagination
+}
+
 export const UPDATE_ROWS_PER_PAGE = (state, rows) => {
   scope(state).pagination.rowsPerPage = rows
   RESET_SCOPE(state)

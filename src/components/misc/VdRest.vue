@@ -199,6 +199,7 @@ export default {
       setFilter: 'SET_FILTER',
       setRowsCount: 'SET_ROWS_NUMBER',
       updateData: 'UPDATE_CURRENT_DATA',
+      updatePagination: 'UPDATE_PAGINATION',
       updateRowsPerPage: 'UPDATE_ROWS_PER_PAGE'
     }),
     delete (id, index) {
@@ -385,7 +386,7 @@ export default {
           this.loading = false
           this.emit({
             event: 'loadManyOK',
-            params: [resp],
+            params: [resp, false, pagination],
             handle: (proceed, error, result) => {
               proceed(result || resp)
             },
@@ -400,6 +401,9 @@ export default {
               if (typeof config.done == 'function') {
                 config.done(resp)
               }
+            },
+            cancel: () => {
+              this.updatePagination(pagination)
             }
           })
           if (typeof this.totalRowsCount == 'function') {
