@@ -122,7 +122,7 @@ export default (Vue, options = {}) => {
        * @returns {string}
        */
       capitalize (str) {
-        return typeof str == 'str' && str
+        return typeof str == 'string' && str
           ? (' ' + str)
             .toLowerCase()
             .replace(/\s[a-z]/g, letter => letter.toUpperCase())
