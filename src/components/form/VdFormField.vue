@@ -41,8 +41,10 @@ export default {
   },
   mounted () {
     if (!this.value && this.value !== 0 && this.defaultValue !== '') {
-      this.$emit('change', this.defaultValue)
-      this.$emit('input', this.defaultValue)
+      setTimeout(() => {
+          this.$emit('change', this.defaultValue)
+          this.$emit('input', this.defaultValue)
+      })
     }
   },
   computed: {
@@ -51,11 +53,14 @@ export default {
     }
   },
   watch: {
+    defaultValue(defaultValue) {
+      this.$emit('change', this.theValue)
+      this.$emit('input', this.theValue)
+    },
     value(value) {
       if (!value && value !== 0 && value !== this.defaultValue) {
         this.$emit('change', this.defaultValue)
         this.$emit('input', this.defaultValue)
-      } else {
       }
     }
   }
