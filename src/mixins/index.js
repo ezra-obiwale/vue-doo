@@ -349,7 +349,7 @@ export default (Vue, options = {}) => {
 
         Object.assign(objClone, obj)
 
-        keys.forEach(key => this.deepDelete(key, objClone))
+        keys.forEach(key => this.deepDelete(objClone, key))
 
         return objClone
       },

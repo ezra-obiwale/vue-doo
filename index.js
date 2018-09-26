@@ -43,7 +43,16 @@ export default {
       if (Array.isArray(components[dir])) {
         components[dir].forEach(componentName => {
           try {
-            Vue.component(componentName, () => import(`./src/components/${dir}/${componentName}.vue`))
+            Vue.component(componentName, () => new Promise((resolve, reject) => {
+                import(`./src/components/${dir}/${componentName}.vue`)
+                  .then(resolve)
+                  .catch(_ => {
+                    import(`./src/components/${dir}/${componentName}.js`)
+                      .then(resolve)
+                      .catch(reject)
+                  })
+              })
+            )
           } catch (e) {
             console.error(e)
           }
