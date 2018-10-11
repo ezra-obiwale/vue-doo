@@ -27,6 +27,6 @@
     "install": "node install.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "version": "4.1.16",
+  "version": "4.1.17",
   "private": false
 }
