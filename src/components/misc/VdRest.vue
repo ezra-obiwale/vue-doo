@@ -323,7 +323,7 @@ export default {
             pagination
           })
         }
-        return this.$emit('loadManyOK', () => {}, this.data, true)
+        return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
       }
       this.loading = true
 
@@ -359,7 +359,7 @@ export default {
           (pagination.page - 1) * pagination.rowsPerPage < this.data.length) &&
           pagination.rowsNumber >= this.data.length)) {
         this.loading = false
-        return this.$emit('loadManyOK', () => {}, this.data, true)
+        return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
       }
 
       this.emit({
