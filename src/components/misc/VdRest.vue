@@ -71,6 +71,10 @@ export default {
     url: {
       type: String
     },
+    useCache: {
+      type: Boolean,
+      default: true
+    },
     watch: {
       type: Object,
       default: function () {
@@ -82,6 +86,7 @@ export default {
     return {
       lastUrl: null,
       loading: false,
+      localData: [],
       isOnline: window.navigator.onLine,
       working: false
     }
@@ -94,16 +99,8 @@ export default {
       storeData: 'data',
       searchQuery: 'searchQuery'
     }),
-    data: {
-      get () {
-        return this.storeData
-      },
-      set (data) {
-        if (this.dummyData) {
-          return this.dummyData = data
-        }
-        return this.setData(data)
-      }
+    data () {
+      return this.useCache ? this.storeData : this.localData
     },
     filter: {
       get () {
@@ -187,7 +184,7 @@ export default {
     ...mapMutations('vdrs', {
       addData: 'ADD_DATA',
       changeSearchQuery: 'CHANGE_SEARCH_QUERY',
-      loadData: 'LOAD_DATA',
+      loadDataToStore: 'LOAD_DATA',
       removeData: 'REMOVE_DATA',
       removeManyByIds: 'REMOVE_MANY_BY_IDS',
       resetCurrentData: 'RESET_CURRENT_DATA',
@@ -313,9 +310,19 @@ export default {
         ? this.storeData[index]
         : this.storeData.find(data => data.id === id)
     },
+    loadData (data) {
+      if (!this.useCache) {
+        this.$set(this, 'localData', this.localData.concat(data.data))
+        data.data = []
+      }
+      this.loadDataToStore(data)
+    },
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination,
         useCache = config.useCache !== false
+      if (useCache) {
+        useCache = this.useCache
+      }
       if (!this.url) {
         if (this.dummyData && !this.data.length) {
           this.loadData({
