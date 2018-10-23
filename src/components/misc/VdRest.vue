@@ -86,6 +86,7 @@ export default {
     return {
       lastUrl: null,
       loading: false,
+      localCurrentDataIndex: -1,
       localData: [],
       isOnline: window.navigator.onLine,
       working: false
@@ -93,12 +94,17 @@ export default {
   },
   computed: {
     ...mapGetters('vdrs', {
-      currentData: 'currentData',
+      storeCurrentData: 'currentData',
       pagination: 'pagination',
       storeFilter: 'filter',
       storeData: 'data',
       searchQuery: 'searchQuery'
     }),
+    currentData () {
+      return this.useCache
+        ? this.storeCurrentData
+        : this.localCurrentDataIndex > -1 ? this.localData[this.localCurrentDataIndex] : {}
+    },
     data () {
       return this.useCache ? this.storeData : this.localData
     },
@@ -182,23 +188,30 @@ export default {
   },
   methods: {
     ...mapMutations('vdrs', {
-      addData: 'ADD_DATA',
+      addStoreData: 'ADD_DATA',
       changeSearchQuery: 'CHANGE_SEARCH_QUERY',
       loadDataToStore: 'LOAD_DATA',
-      removeData: 'REMOVE_DATA',
-      removeManyByIds: 'REMOVE_MANY_BY_IDS',
+      removeStoreData: 'REMOVE_DATA',
+      removeStoreManyByIds: 'REMOVE_MANY_BY_IDS',
       resetCurrentData: 'RESET_CURRENT_DATA',
-      resetData: 'RESET_DATA',
+      resetStoreData: 'RESET_DATA',
       scopeTo: 'SCOPE_TO',
-      setCurrentData: 'SET_CURRENT_DATA',
-      setCurrentDataById: 'SET_CURRENT_DATA_BY_ID',
+      setStoreCurrentData: 'SET_CURRENT_DATA',
+      setStoreCurrentDataById: 'SET_CURRENT_DATA_BY_ID',
       setCurrentDataPage: 'SET_CURRENT_DATA_PAGE',
       setFilter: 'SET_FILTER',
       setRowsCount: 'SET_ROWS_NUMBER',
-      updateData: 'UPDATE_CURRENT_DATA',
+      updateStoreData: 'UPDATE_CURRENT_DATA',
       updatePagination: 'UPDATE_PAGINATION',
       updateRowsPerPage: 'UPDATE_ROWS_PER_PAGE'
     }),
+    addData(data) {
+      if (this.useCache) {
+        this.addStoreData(data)
+      } else {
+        this.localData.unshift(data)
+      }
+    },
     delete (id, index) {
       if (this.working) {
         return
@@ -520,6 +533,53 @@ export default {
       this.resetData()
       this.loadMany({ useCache: false })
     },
+    removeData (id, index) {
+      if (this.useCache) {
+        this.removeStoreData({ id, index })
+      } else if (id) {
+        if (index == undefined) {
+          index = this.localData.findIndex(data => data.id == id)
+        }
+        if (index > -1) {
+          this.localData.splice(index, 1)
+        }
+      }
+    },
+    removeManyByIds (ids) {
+      if (this.useCache) {
+        this.removeStoreManyByIds(ids)
+      } else if (Array.isArray(ids)) {
+        ids.forEach(
+          id => this.localData.splice(
+            this.localData.findIndex(
+              row => row.id == id
+            ),
+            1
+          )
+        )
+      }
+    },
+    resetData () {
+      if (this.useCache) {
+        this.resetStoreData()
+      } else {
+        this.$set(this, 'localData', [])
+      }
+    },
+    setCurrentData(data) {
+      if (this.useCache) {
+        this.setStoreCurrentData(data)
+      } else {
+        this.localCurrentDataIndex = this.localData.findIndex(_data => _data.id == data.id)
+      }
+    },
+    setCurrentDataById(id) {
+      if (this.useCache) {
+        this.setStoreCurrentDataById(id)
+      } else {
+        this.setCurrentData({ id })
+      }
+    },
     save(formData, htmlForm) {
       if (this.working) {
         return
@@ -647,6 +707,13 @@ export default {
     },
     searchQueryChanged(query) {
       this.search = query
+    },
+    updateData (data) {
+      if (this.useCache) {
+        this.updateStoreData(data)
+      } else if (this.localCurrentDataIndex > -1) {
+        this.localData[this.localCurrentDataIndex] = data
+      }
     },
     urlChanged (config = {}) {
       if (this.readOnlyId) {
