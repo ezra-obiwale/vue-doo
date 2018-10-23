@@ -541,6 +541,9 @@ export default {
           index = this.localData.findIndex(data => data.id == id)
         }
         if (index > -1) {
+          if (index == this.localCurrentDataIndex) {
+            this.localCurrentDataIndex = -1
+          }
           this.localData.splice(index, 1)
         }
       }
@@ -550,12 +553,13 @@ export default {
         this.removeStoreManyByIds(ids)
       } else if (Array.isArray(ids)) {
         ids.forEach(
-          id => this.localData.splice(
-            this.localData.findIndex(
-              row => row.id == id
-            ),
-            1
-          )
+          id => {
+            let index = this.localData.findIndex(row => row.id == id)
+            if (index == this.localCurrentDataIndex) {
+              this.localCurrentDataIndex = -1
+            }
+            this.localData.splice(index, 1)
+          }
         )
       }
     },
@@ -712,7 +716,7 @@ export default {
       if (this.useCache) {
         this.updateStoreData(data)
       } else if (this.localCurrentDataIndex > -1) {
-        this.localData[this.localCurrentDataIndex] = data
+        this.$set(this.localData, this.localCurrentDataIndex, data)
       }
     },
     urlChanged (config = {}) {
