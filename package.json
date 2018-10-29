@@ -7,6 +7,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "hellojs": "^2.0.0-4",
+    "localforage": "^1.7.3",
     "sweetalert": "^2.1.0",
     "vue": "^2.5.13",
     "vue-social-sharing": "^2.3.3",
