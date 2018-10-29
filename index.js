@@ -1,5 +1,8 @@
 import mixins from './src/mixins'
 import RestStore from './src/store/rest'
+import store from './src/store'
+
+export const Store = store
 
 export default {
 

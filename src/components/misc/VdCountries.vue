@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import Http from '../../http'
 export default {
   name: 'VdCountries',
   props: {
@@ -112,12 +113,13 @@ export default {
     },
     load () {
       this.loading = true
-      $.get('//restcountries.eu/rest/v2/all')
-        .done(resp => {
+      new Http()
+        .get('//restcountries.eu/rest/v2/all')
+        .then(resp => {
           this.loading = false
           this.$set(this, 'countries', resp)
         })
-        .error(resp => {
+        .catch(resp => {
           this.error = true
           this.loading = false
           this.notify('Load countries failed', 'error')

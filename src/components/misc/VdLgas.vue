@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import Http from '../../http'
 export default {
   name: 'VdLgas',
   inheritAttrs: false,
@@ -126,12 +127,13 @@ export default {
     },
     load (state) {
       this.loading = true
-      $.get(`//nigeria.herokuapp.com/api/v1/states/${state}/lgas`)
-        .done(resp => {
+      new Http()
+        .get(`//nigeria.herokuapp.com/api/v1/states/${state}/lgas`)
+        .then(resp => {
           this.$set(this, 'lgas', resp.data)
           this.loading = false
         })
-        .error(resp => {
+        .catch(resp => {
           this.notify('Load LGAs failed', 'error')
           this.error = true
           this.loading = false

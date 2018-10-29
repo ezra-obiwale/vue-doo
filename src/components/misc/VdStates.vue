@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import Http from '../../http'
 export default {
   name: 'VdStates',
   props: {
@@ -112,19 +113,19 @@ export default {
     },
     load () {
       this.loading = true
-      $.get('//nigeria.herokuapp.com/api/v1/states/')
-        .done(resp => {
+      new Http()
+        .get('//nigeria.herokuapp.com/api/v1/states/')
+        .then(resp => {
           this.loading = false
           this.$set(this, 'states', resp.data)
         })
-        .error(resp => {
+        .catch(resp => {
           this.error = true
           this.loading = false
           this.notify('Load states failed', 'error')
         })
     },
     reload () {
-      alert()
       if (this.error) {
         this.error = false
         this.load()

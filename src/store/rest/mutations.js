@@ -1,28 +1,19 @@
 import { scope, newScope as NewScope } from './helpers'
+import Store from '../'
 import localforage from 'localforage'
 import Vue from 'vue'
 
-const forage = {
-  load(storeName, state) {
-    localforage.config({ storeName })
-    return localforage.iterate((data, key) => {
-      if (!isNaN(key)) {
-        scope(state).data.push(data)
-      } else if (key.startsWith('_')) {
-        key = key.substr(1)
-        if (scope(state).hasOwnProperty(key)) {
-          scope(state)[key] = data
-        }
-      }
-    })
-  },
-  save(key) {
-    if (key.trim()) {
-      return localforage.setItem(...arguments)
+
+let forage
+const loadData = (data, key) => {
+  if (!isNaN(key)) {
+    scope(state).data.push(data)
+  } else if (key.startsWith('_')) {
+    key = key.substr(1)
+    if (scope(state).hasOwnProperty(key)) {
+      scope(state)[key] = data
     }
-  },
-  get: localforage.getItem,
-  remove: localforage.removeItem
+  }
 }
 
 export const ADD_DATA = (state, data) => {
@@ -90,7 +81,7 @@ export const RESET_DATA = (state) => {
 const RESET_SCOPE = state => {
   if (state.previousCollectionIndex > -1) {
     state.collectionIndex = state.previousCollectionIndex
-    forage.load(scope(state).collections[state.collectionIndex].id, state)
+    forage = new Store({ storeName: scope(state).collections[state.collectionIndex].id }).each(loadData)
   }
 }
 
@@ -102,7 +93,7 @@ export const SCOPE_TO = (state, id) => {
     state.collections.push(collection)
     state.collectionIndex = state.collections.length - 1
   }
-  forage.load(id, state)
+  forage = new Store({ storeName: id }).each(loadData)
 }
 
 export const SET_CURRENT_DATA = (state, data) => {

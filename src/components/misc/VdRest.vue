@@ -9,7 +9,6 @@
 </template>
 
 <script>
-import store from '../../store/rest'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'VdRest',
