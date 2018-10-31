@@ -1,7 +1,7 @@
 <template>
   <component
-    v-if="this.component"
-    :is="this.component"
+    v-if="component"
+    :is="component"
     v-bind="customBind"
     v-on="$listeners"
     v-model="model"
