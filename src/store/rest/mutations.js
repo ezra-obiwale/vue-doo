@@ -5,7 +5,7 @@ import Vue from 'vue'
 
 
 let forage
-const loadData = (data, key) => {
+const loadData = (data, key, state) => {
   if (!isNaN(key)) {
     scope(state).data.push(data)
   } else if (key.startsWith('_')) {
@@ -81,7 +81,7 @@ export const RESET_DATA = (state) => {
 const RESET_SCOPE = state => {
   if (state.previousCollectionIndex > -1) {
     state.collectionIndex = state.previousCollectionIndex
-    forage = new Store({ storeName: scope(state).collections[state.collectionIndex].id }).each(loadData)
+    forage = new Store({ storeName: scope(state).collections[state.collectionIndex].id }).each((data, key) => loadData(data, key, state))
   }
 }
 
@@ -93,7 +93,7 @@ export const SCOPE_TO = (state, id) => {
     state.collections.push(collection)
     state.collectionIndex = state.collections.length - 1
   }
-  forage = new Store({ storeName: id }).each(loadData)
+  forage = new Store({ storeName: id }).each((data,key) => loadData(data, key, state))
 }
 
 export const SET_CURRENT_DATA = (state, data) => {
