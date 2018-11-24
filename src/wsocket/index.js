@@ -2,9 +2,7 @@ export default class WSocket {
 
   constructor (url) {
     this._callbacks = {}
-    if (url) {
-      this.connect(url)
-    }
+    this.reconnectionTime = 1000
     this.queued = false
     try {
       this.queue = JSON.parse(localStorage.getItem('wsq'))
@@ -13,6 +11,10 @@ export default class WSocket {
       }
     } catch (e) {
       this.queue = []
+    }
+
+    if (url) {
+      this.connect(url)
     }
   }
 
@@ -26,11 +28,17 @@ export default class WSocket {
     this.ws = new WebSocket(url)
     this.ws.onopen = () => {
       this._connected(...arguments)
+      this.reconnectionTime = 1000
       this._resolve('connect', ...arguments)
     }
     this.ws.onerror = () => this._resolve('error', ...arguments)
     this.ws.onclose = () => {
-      this.connect(url)
+      setTimeout(() => {
+        this.connect(url)
+      }, this.reconnectionTime)
+      if (this.reconnectionTime < 16000) {
+        this.reconnectionTime *= 2
+      }
       this._resolve('disconnect', ...arguments)
     }
     this.ws.onmessage = response => {
