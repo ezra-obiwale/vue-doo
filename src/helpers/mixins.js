@@ -58,10 +58,12 @@ export default class {
         }
       }
 
-      const $Store = new Store({
-        plugins: [createdPersistedState(store)],
-        modules: modules
-      });
+      let plugins = []
+      if (store.persist) {
+        plugins.push(createdPersistedState(store))
+      }
+
+      const $Store = new Store({ plugins, modules });
 
       if (!$vm) {
         return $Store;
