@@ -16,8 +16,13 @@ export default class {
 
     _Vue.use(Vuex);
 
+    let plugins = []
+    if (options.persist) {
+      plugins.push(createdPersistedState(options))
+    }
+
     this.vuex = new Vuex.Store({
-      plugins: [createdPersistedState(options)],
+      plugins,
       state: {},
       mutations: {
         SET(state, payload) {

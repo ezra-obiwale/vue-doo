@@ -2,7 +2,6 @@ import Mixins from './src/helpers/mixins';
 import Store from './src/helpers/store';
 import components from './src/components';
 import Vuex from 'vuex';
-import createdPersistedState from 'vuex-persistedstate';
 
 const VueDoo = {
   componentWithStore(component, { moduleName, states, getters, actions, mutations }) {

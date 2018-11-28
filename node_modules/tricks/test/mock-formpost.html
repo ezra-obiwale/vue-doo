@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<script>
+// jsonp mock
+// Find the full path of this request
+
+var match = /([^=\/\&]+)=([^\&]+)/g;
+var str = window.location.search.replace(/^\?/, '');
+var m;
+var o = {};
+while((m = match.exec(str))) {
+	o[m[1]] = decodeURIComponent(m[2]);
+}
+if (o.callback) {
+	window.parent[o.callback](o.response ? JSON.parse(o.response) : {status: 'success'});
+}
+
+</script>
