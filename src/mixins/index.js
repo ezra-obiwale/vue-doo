@@ -43,6 +43,13 @@ export default (Vue, options = {}) => {
   }
   const path = options.navPath || (path => path)
 
+  if (options.features.socialSharing) {
+    Vue.use(VueSocialSharing)
+  }
+  if (options.features.toasts) {
+    Vue.use(Toasted, typeof options.features.toasts == 'object' ? options.features.toasts : {})
+  }
+
   let mixins = {
     beforeCreate () {
       if (options.features.hello) {
@@ -50,6 +57,14 @@ export default (Vue, options = {}) => {
       }
       if (options.features.http) {
         this.$http = new Http(options.http)
+      }
+      if (options.features.sweetalert) {
+        this.$swal = Swal
+      }
+      if (options.features.toasts) {
+        this.$toasts = (message, options) => {
+          return this.$toasted.show(message, options)
+        }
       }
 
       let $vm = this
@@ -658,8 +673,8 @@ export default (Vue, options = {}) => {
   }
 
   if (options.features.hello) {
-    mixins.hello = Hello.init(deepValue(options, 'hello.credentials', {}), deepValue(options, 'hello.options', {}))
-    mixins.onHello = callback => {
+    mixin.methods.hello = Hello.init(deepValue(options, 'hello.credentials', {}), deepValue(options, 'hello.options', {}))
+    mixin.methods.onHello = callback => {
       Hello.on("auth.login", auth => {
         if (typeof callback === 'function') {
           callback(auth)
@@ -667,19 +682,6 @@ export default (Vue, options = {}) => {
       })
     }
   }
-  if (options.features.socialSharing) {
-    Vue.use(VueSocialSharing)
-  }
-  if (options.features.sweetalert) {
-    mixins.swal = Swal
-  }
-  if (options.features.toasts) {
-    Vue.use(Toasted, typeof options.features.toasts == 'object' ? options.features.toasts : {})
-    mixins.toasts = (message, options) => {
-      return this.$toasted.show(message, options)
-    }
-  }
 
   return mixins
-
 }
