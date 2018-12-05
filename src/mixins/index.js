@@ -112,6 +112,9 @@ export default (Vue, options = {}) => {
           Vue.prototype.$ws = ws
         }
       }
+      if (this.$http) {
+        this.$http.setVue(this)
+      }
     },
     beforeDestroy () {
       if (options.features.wsocket) {
