@@ -49,14 +49,14 @@ export default (Vue, options = {}) => {
   if (options.features.toasts) {
     Vue.use(Toasted, typeof options.features.toasts == 'object' ? options.features.toasts : {})
   }
+  if (options.features.http) {
+    Vue.prototype.$http = new Http(typeof options.features.http == 'object' ? options.features.http : options.http)
+  }
 
   let mixins = {
     beforeCreate () {
       if (options.features.hello) {
         this.$hello = Hello
-      }
-      if (options.features.http) {
-        this.$http = new Http(options.http)
       }
       if (options.features.sweetalert) {
         this.$swal = Swal
