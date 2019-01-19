@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import store from '../../store/rest'
 import { mapMutations, mapGetters } from 'vuex'
 export default {
   name: 'VdRest',
@@ -70,6 +71,10 @@ export default {
     url: {
       type: String
     },
+    useCache: {
+      type: Boolean,
+      default: true
+    },
     watch: {
       type: Object,
       default: function () {
@@ -81,28 +86,27 @@ export default {
     return {
       lastUrl: null,
       loading: false,
+      localCurrentDataIndex: -1,
+      localData: [],
       isOnline: window.navigator.onLine,
       working: false
     }
   },
   computed: {
     ...mapGetters('vdrs', {
-      currentData: 'currentData',
+      storeCurrentData: 'currentData',
       pagination: 'pagination',
       storeFilter: 'filter',
       storeData: 'data',
       searchQuery: 'searchQuery'
     }),
-    data: {
-      get () {
-        return this.storeData
-      },
-      set (data) {
-        if (this.dummyData) {
-          return this.dummyData = data
-        }
-        return this.setData(data)
-      }
+    currentData () {
+      return this.useCache
+        ? this.storeCurrentData
+        : this.localCurrentDataIndex > -1 ? this.localData[this.localCurrentDataIndex] : {}
+    },
+    data () {
+      return this.useCache ? this.storeData : this.localData
     },
     filter: {
       get () {
@@ -179,23 +183,30 @@ export default {
   },
   methods: {
     ...mapMutations('vdrs', {
-      addData: 'ADD_DATA',
+      addStoreData: 'ADD_DATA',
       changeSearchQuery: 'CHANGE_SEARCH_QUERY',
-      loadData: 'LOAD_DATA',
-      removeData: 'REMOVE_DATA',
-      removeManyByIds: 'REMOVE_MANY_BY_IDS',
+      loadDataToStore: 'LOAD_DATA',
+      removeStoreData: 'REMOVE_DATA',
+      removeStoreManyByIds: 'REMOVE_MANY_BY_IDS',
       resetCurrentData: 'RESET_CURRENT_DATA',
-      resetData: 'RESET_DATA',
+      resetStoreData: 'RESET_DATA',
       scopeTo: 'SCOPE_TO',
-      setCurrentData: 'SET_CURRENT_DATA',
-      setCurrentDataById: 'SET_CURRENT_DATA_BY_ID',
+      setStoreCurrentData: 'SET_CURRENT_DATA',
+      setStoreCurrentDataById: 'SET_CURRENT_DATA_BY_ID',
       setCurrentDataPage: 'SET_CURRENT_DATA_PAGE',
       setFilter: 'SET_FILTER',
       setRowsCount: 'SET_ROWS_NUMBER',
-      updateData: 'UPDATE_CURRENT_DATA',
+      updateStoreData: 'UPDATE_CURRENT_DATA',
       updatePagination: 'UPDATE_PAGINATION',
       updateRowsPerPage: 'UPDATE_ROWS_PER_PAGE'
     }),
+    addData(data) {
+      if (this.useCache) {
+        this.addStoreData(data)
+      } else {
+        this.localData.unshift(data)
+      }
+    },
     buildUrl ({ page, sortBy, descending, rowsPerPage }) {
       if (!this.url) {
         return ''
@@ -225,6 +236,10 @@ export default {
         fullUrl += `&length=${rowsPerPage}`
       }
       return fullUrl
+    },
+    clearSearchQuery () {
+      this.search = ''
+      this.loadMany({ useCache: false })
     },
     delete (id, index) {
       if (this.working) {
@@ -337,9 +352,19 @@ export default {
         ? this.storeData[index]
         : this.storeData.find(data => data.id === id)
     },
+    loadData (data) {
+      if (!this.useCache) {
+        this.$set(this, 'localData', this.localData.concat(data.data))
+        data.data = []
+      }
+      this.loadDataToStore(data)
+    },
     loadMany(config = {}) {
       let pagination = config.pagination || this.pagination,
         useCache = config.useCache !== false
+      if (useCache) {
+        useCache = this.useCache
+      }
       if (!this.url) {
         if (this.dummyData && !this.data.length) {
           this.loadData({
@@ -355,14 +380,14 @@ export default {
 
       this.updateRowsPerPage(pagination.rowsPerPage)
 
-      if ((!this.lastUrl || this.lastUrl == fullUrl) && // same or no url
-          (useCache && this.data.length && (pagination.page == 1 || // use cache when there are more data to fetch
-          (pagination.page - 1) * pagination.rowsPerPage < this.data.length) &&
-          pagination.rowsNumber >= this.data.length)) {
-        this.loading = false
-        return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
-      }
-
+      // if (this.lastUrl == fullUrl &&
+      //     useCache && this.data.length && (pagination.page == 1 ||
+      //     (pagination.page - 1) * pagination.rowsPerPage < this.data.length) &&
+      //     pagination.rowsNumber >= this.data.length) {
+      //     alert('canceling')
+      //   this.loading = false
+      //   return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
+      // }
       this.emit({
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
@@ -530,8 +555,55 @@ export default {
       this.resetData()
       this.loadMany({ useCache: false })
     },
-    performSearch() {
+    performSearch(query) {
       this.loadMany({ useCache: false })
+    },
+    removeData (id, index) {
+      if (this.useCache) {
+        this.removeStoreData({ id, index })
+      } else if (id) {
+        if (index == undefined) {
+          index = this.localData.findIndex(data => data.id == id)
+        }
+        if (index > -1) {
+          this.localData.splice(index, 1)
+        }
+      }
+    },
+    removeManyByIds (ids) {
+      if (this.useCache) {
+        this.removeStoreManyByIds(ids)
+      } else if (Array.isArray(ids)) {
+        ids.forEach(
+          id => this.localData.splice(
+            this.localData.findIndex(
+              row => row.id == id
+            ),
+            1
+          )
+        )
+      }
+    },
+    resetData () {
+      if (this.useCache) {
+        this.resetStoreData()
+      } else {
+        this.$set(this, 'localData', [])
+      }
+    },
+    setCurrentData(data) {
+      if (this.useCache) {
+        this.setStoreCurrentData(data)
+      } else {
+        this.localCurrentDataIndex = this.localData.findIndex(_data => _data.id == data.id)
+      }
+    },
+    setCurrentDataById(id) {
+      if (this.useCache) {
+        this.setStoreCurrentDataById(id)
+      } else {
+        this.setCurrentData({ id })
+      }
     },
     save(formData, htmlForm) {
       if (this.working) {
@@ -660,6 +732,13 @@ export default {
     },
     searchQueryChanged(query) {
       this.search = query
+    },
+    updateData (data) {
+      if (this.useCache) {
+        this.updateStoreData(data)
+      } else if (this.localCurrentDataIndex > -1) {
+        this.localData[this.localCurrentDataIndex] = data
+      }
     },
     urlChanged (config = {}) {
       if (this.readOnlyId) {
