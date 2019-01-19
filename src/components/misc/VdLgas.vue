@@ -111,6 +111,7 @@ export default {
         return this.value
       },
       set (value) {
+        this.$emit('input', value)
         this.$emit('change', value)
       }
     }
@@ -123,6 +124,7 @@ export default {
   },
   methods: {
     changed (e) {
+      this.$emit('input', e.target.value)
       this.$emit('change', e.target.value)
     },
     load (state) {
