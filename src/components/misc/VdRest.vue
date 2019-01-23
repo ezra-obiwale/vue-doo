@@ -544,7 +544,7 @@ export default {
             event: 'addData',
             params: [formData, true],
             handle: (proceed, error, result) => {
-              proceed(result || resp)
+              proceed(result || formData)
             },
             proceed: formData => {
               this.working = false
@@ -574,7 +574,7 @@ export default {
             event: 'editData',
             params: [formData, true],
             handle: (proceed, error, result) => {
-              proceed(result || resp)
+              proceed(result || formData)
             },
             proceed: formData => {
               this.updateData(Object.assign({}, formData))
