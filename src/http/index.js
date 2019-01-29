@@ -7,10 +7,15 @@ export default class Http {
    */
   constructor (options = {}) {
     this.axios = axios.create(options)
+    this.axios.interceptors.request.use(config => {
+      config.headers = Object.assign({}, config.headers, this.headers)
+      return config
+    })
 
     this.emitAjaxEvents = true
     this.working = 0
     this.useGlobalCatch = true
+    this.headers = {}
   }
 
   delete () {
@@ -56,7 +61,8 @@ export default class Http {
   }
 
   setHeader (key, value) {
-    this.axios.defaults.headers.common[key] = value
+    // this.axios.defaults.headers.common[key] = value
+    this.headers[key] = value
     return this
   }
 
