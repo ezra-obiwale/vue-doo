@@ -5,7 +5,7 @@
     "email": "contact@ezraobiwale.com"
   },
   "dependencies": {
-    "axios": "^0.18.01",
+    "axios": "^0.18.0",
     "hellojs": "^2.0.0-4",
     "localforage": "^1.7.3",
     "sweetalert": "^2.1.0",
