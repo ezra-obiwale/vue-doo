@@ -70,6 +70,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    valueKey: {
+      type: String,
+      default: 'id'
     }
   },
   data () {
@@ -92,7 +96,7 @@ export default {
       for (let id in this.lgas) {
         options.push({
           label: this.lgas[id].name,
-          value: this.lgas[id].id
+          value: this.lgas[id][this.valueKey]
         })
       }
       return options

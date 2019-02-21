@@ -61,6 +61,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    valueKey: {
+      type: String,
+      default: 'alpha2Code'
     }
   },
   data () {
@@ -99,7 +103,7 @@ export default {
       this.countries.forEach(country => {
         options.push({
           label: country.name,
-          value: country.alpha2Code
+          value: country[this.valueKey]
         })
       })
       return options

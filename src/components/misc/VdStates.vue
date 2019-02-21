@@ -61,6 +61,10 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    valueKey: {
+      type: String,
+      default: 'id'
     }
   },
   data () {
@@ -99,7 +103,7 @@ export default {
       for (let id in this.states) {
         options.push({
           label: this.states[id].name,
-          value: this.states[id].id
+          value: this.states[id][this.valueKey]
         })
       }
       return options
