@@ -311,7 +311,7 @@ export default (Vue, options = {}) => {
         this.$emit(event, (resultOrOptions, err) => {
           if (resultOrOptions === undefined) {
             // not handled
-            handle(proceed, err, resultOrOptions, ...params)
+            handle(proceed, error, resultOrOptions, ...params)
             reset()
           }
           else if (resultOrOptions) {
