@@ -363,7 +363,7 @@ export default {
         return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
       }
 
-      this.emit({
+      const event = {
         event: 'loadMany',
         params: [fullUrl, pagination, this.search, this.filter],
         handle: (proceed, error, resultUrl) => {
@@ -385,6 +385,9 @@ export default {
             .catch(error)
         },
         proceed: resp => {
+          if (typeof resp == 'string') {
+            return event.handle(event.proceed, event.error, resp)
+          }
           this.emit({
             event: 'loadManyOK',
             params: [resp, false, pagination],
@@ -444,7 +447,8 @@ export default {
             }
           })
         }
-      })
+      }
+      this.emit(event)
     },
     loadOne(id) {
       if (this.data.length) {
@@ -463,7 +467,7 @@ export default {
       }
       let url = this.withSlash() + id
       this.loading = true
-      this.emit({
+      const event = {
         event: 'loadOne',
         params: [id, url],
         handle: (proceed, error, resultUrl) => {
@@ -485,6 +489,9 @@ export default {
             .catch(error)
         },
         proceed: resp => {
+          if (typeof resp == 'string') {
+            return event.handle(event.proceed, event.error, resp)
+          }
           this.emit({
             event: 'loadOneOK',
             params: [resp],
@@ -521,7 +528,8 @@ export default {
             }
           })
         }
-      })
+      }
+      this.emit(event)
     },
     performFilter(filter) {
       if (filter) {
