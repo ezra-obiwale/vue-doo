@@ -52,6 +52,11 @@ export default {
       type: [Number, String],
       default: 0
     },
+    rowsPerPage: {
+      type: Number,
+      default: 15,
+      required: true
+    },
     successMessages: {
       type: Object,
       default: function () {
@@ -350,10 +355,11 @@ export default {
         return this.$emit('loadManyOK', () => {}, this.data, true, pagination)
       }
       this.loading = true
+      pagination.rowsPerPage = pagination.rowsPerPage || this.rowsPerPage
 
       let fullUrl = this.buildUrl(pagination)
 
-      this.updateRowsPerPage(pagination.rowsPerPage)
+      this.updateRowsPerPage(this.rowsPerPage || pagination.rowsPerPage)
 
       if ((!this.lastUrl || this.lastUrl == fullUrl) && // same or no url
           (useCache && this.data.length && (pagination.page == 1 || // use cache when there are more data to fetch
@@ -398,6 +404,7 @@ export default {
               if (pagination.page == 1) {
                 this.resetData()
               }
+              pagination.page++
               this.loadData({
                 data: resp.data,
                 pagination
