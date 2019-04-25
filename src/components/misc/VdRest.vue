@@ -249,7 +249,7 @@ export default {
               proceed(result || resp)
             },
             proceed: resp => {
-              this.removeData(id, index)
+              this.removeData({ id, index })
             }
           })
         },

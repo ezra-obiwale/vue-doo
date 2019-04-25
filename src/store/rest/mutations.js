@@ -29,11 +29,13 @@ export const LOAD_DATA = (state, { data, pagination }) => {
   RESET_SCOPE(state)
 }
 
-export const REMOVE_DATA = (state, id, index) => {
+export const REMOVE_DATA = (state, { id, index }) => {
   if (index === undefined && id) {
     index = scope(state).data.findIndex(row => row.id == id)
   }
-  scope(state).data.splice(index,1)
+  if (index !== undefined) {
+    scope(state).data.splice(index,1)
+  }
   RESET_SCOPE(state)
 }
 
